@@ -23,6 +23,8 @@ public class ModelFactory{
 	private final static short[][] fa = {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0},
 			{0, 0, 0, 0}};
 	private final static MeshBuilder builder = new MeshBuilder();
+	
+	
 
 	//model = modelBuilder.createBox(5f, 5f, 5f, new Material(ColorAttribute.createDiffuse(Color.CORAL)), Usage.Position | Usage.Normal);
 
@@ -79,14 +81,14 @@ public class ModelFactory{
 
 		Vector3 normal = new Vector3(0, 1, 0);
 
-		if(vals == null){
+		//if(vals == null){
 			fa[index][0] = builder.vertex(corner00, normal, null, new Vector2(0, 1));
 			fa[index][1] = builder.vertex(corner10, normal, null, new Vector2(1, 1));
-		}else{
-			fa[index][0] = vals[1];
-			fa[index][1] = vals[2];
+		//}else{
+		//	fa[index][0] = vals[1];
+		//	fa[index][1] = vals[2];
 
-		}
+		//}
 
 		fa[index][2] = builder.vertex(corner11, normal, null, new Vector2(1, 0));
 		fa[index][3] = builder.vertex(corner01, normal, null, new Vector2(0, 0));
@@ -94,6 +96,28 @@ public class ModelFactory{
 		builder.index(fa[index][0], fa[index][1], fa[index][2], fa[index][2], fa[index][3], fa[index][0]);
 
 		return fa[index];
+	}
+	
+	public static void cube(float x, float y, float z, float size){
+		builder.ensureRectangles(6);
+		
+		short[] sa = {-1, -1, -1, -1, -1, -1, -1, -1, }; //8 -1 shorts
+		
+		Vector3[] vectors = new Vector3[8];
+		
+		for(int i = 0; i < vectors.length; i ++){
+			vectors[i] = new Vector3(); 
+		}
+		
+		sa[0] = builder.vertex(vectors[0], Normals.down, null, new Vector2(0, 1));
+		sa[1] = builder.vertex(vectors[1], Normals.down, null, new Vector2(1, 1));
+
+
+		sa[2] = builder.vertex(vectors[2], Normals.down, null, new Vector2(1, 0));
+		sa[3] = builder.vertex(vectors[3], Normals.down, null, new Vector2(0, 0));
+
+		builder.index(sa[0], sa[1], sa[2], sa[2], sa[3], sa[0]);
+
 	}
 
 	public static void init(){

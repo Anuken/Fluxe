@@ -18,6 +18,11 @@ public class ChunkMap{
 		map.put(z, chunk);
 	}
 	
+	public void remove(Chunk chunk){
+		ObjectMap<Integer, Chunk> map = getZMap(chunk.x,chunk.y,chunk.z);
+		map.remove(chunk.z);
+	}
+	
 	private ObjectMap<Integer, Chunk> getZMap(int x, int y, int z){
 		ObjectMap<Integer, ObjectMap<Integer, Chunk>> map1 = chunks.get(x);
 		if(map1 == null){

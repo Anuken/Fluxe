@@ -8,9 +8,11 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Renderable;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
 
 public class Chunk implements Disposable{
+	private static final Vector3 vector = new Vector3();
 	public final int x,y,z;
 	private Mesh[] meshes;
 	private Renderable[] renderables;
@@ -38,6 +40,14 @@ public class Chunk implements Disposable{
 			renderables[i] = renderable;
 		}
 		
+	}
+	
+	public Vector3 getCornerPosition(){
+		return vector.set(x*voxelsize*chunksize, y*voxelsize*chunksize, z*voxelsize*chunksize);
+	}
+	
+	public Vector3 getCenterPosition(){
+		return vector.set(x*voxelsize*chunksize+voxelsize*chunksize/2, y*voxelsize*chunksize+voxelsize*chunksize/2, z*voxelsize*chunksize+voxelsize*chunksize/2);
 	}
 	
 	public Mesh[] getMeshes(){

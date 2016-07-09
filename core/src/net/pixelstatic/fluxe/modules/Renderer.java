@@ -13,8 +13,8 @@ import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight;
 import com.badlogic.gdx.graphics.g3d.shaders.DepthShader;
-import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider;
+import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 
@@ -23,7 +23,7 @@ public class Renderer extends Module<Fluxe>{
 	public Environment environment;
 	public PerspectiveCamera cam;
 	public ModelBatch modelBatch, shadowBatch;
-	public CameraInputController camController;
+	public FirstPersonCameraController camController;
 	public FrameBufferMap buffers = new FrameBufferMap();
 	public DirectionalShadowLight shadowLight;
 	public int pixelscale = 1;
@@ -51,15 +51,18 @@ public class Renderer extends Module<Fluxe>{
 		shadowBatch = new ModelBatch(provider);
 
 		cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		cam.position.set(10f, 10f, 10f);
-		cam.lookAt(0, 0, 0);
+		cam.position.set(0f, 80f, 0f);
+		cam.lookAt(0, 80, 10);
+		//cam.lookAt(0, 0, 0);
 		cam.near = 1f;
 		cam.far = 2000f;
 		cam.update();
-
-		camController = new CameraInputController(cam);
-		Gdx.input.setInputProcessor(camController);
 		
+		
+		camController = new FirstPersonCameraController(cam);
+		
+		//camController.setDegreesPerPixel(1f);
+		//Gdx.input.setInputProcessor(camController);
 	}
 
 	@Override

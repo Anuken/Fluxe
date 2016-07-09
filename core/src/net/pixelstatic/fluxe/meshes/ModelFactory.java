@@ -22,18 +22,6 @@ public class ModelFactory{
 			vectors[i] = new Vector3();
 		}
 	}
-
-	public static Mesh createCube(float x, float y, float z, float size){
-		int vsize = 500;
-
-		Mesh mesh = new Mesh(false, false, vsize, vsize, new VertexAttributes(VertexAttribute.Position(), VertexAttribute.Normal()));
-
-		float[] vertices = new float[vsize];
-
-		mesh.getVertices(vertices);
-
-		return mesh;
-	}
 	
 	public static void begin(){
 		if(meshes != null) throw new IllegalArgumentException("Call end() first.");

@@ -22,7 +22,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 @SuppressWarnings("deprecation")
-public class Editor extends Module<Fluxe>{
+public class Renderer extends Module<Fluxe>{
 	public Environment environment;
 	public PerspectiveCamera cam;
 	public ModelBatch modelBatch, shadowBatch;
@@ -45,7 +45,7 @@ public class Editor extends Module<Fluxe>{
 		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
 		environment.add(shadowLight.set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
 
-		environment.shadowMap = shadowLight;
+		//environment.shadowMap = shadowLight;
 		
 		FileHandle fragshader = Gdx.files.internal("shaders/depth.fragment");
 		

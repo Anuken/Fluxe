@@ -114,44 +114,6 @@ public class ModelFactory{
 		return !exists(array, x, y, z) && exists(array, x, y - 1, z);
 	}
 
-	/*
-		public static void cube(float x, float y, float z, float size, boolean top, boolean bottom, boolean left, boolean right, boolean front, boolean back){
-			builder.ensureRectangles(6);
-
-			vectors[0].set(x, y, z);
-			vectors[1].set(x, y, z + size);
-			vectors[2].set(x + size, y, z + size);
-			vectors[3].set(x + size, y, z);
-
-			vectors[4].set(x, y + size, z);
-			vectors[5].set(x, y + size, z + size);
-			vectors[6].set(x + size, y + size, z + size);
-			vectors[7].set(x + size, y + size, z);
-
-			sa[3] = builder.vertex(vectors[0], Normals.down, null, uv01);
-			sa[2] = builder.vertex(vectors[1], Normals.down, null, uv11);
-
-			sa[1] = builder.vertex(vectors[2], Normals.down, null, uv10);
-			sa[0] = builder.vertex(vectors[3], Normals.down, null, uv00);
-
-			sa[4] = builder.vertex(vectors[4], Normals.up, null, uv01);
-			sa[5] = builder.vertex(vectors[5], Normals.up, null, uv11);
-
-			sa[6] = builder.vertex(vectors[6], Normals.up, null, uv10);
-			sa[7] = builder.vertex(vectors[7], Normals.up, null, uv00);
-
-			if(top)builder.index(sa[0], sa[1], sa[2], sa[2], sa[3], sa[0]); //top
-			if(bottom)builder.index(sa[4], sa[5], sa[6], sa[6], sa[7], sa[4]); //bottom
-
-			if(right)rect(sa[2], sa[1], sa[6], sa[5]); //right
-			if(left)rect(sa[4], sa[7], sa[0], sa[3]); //left
-
-			if(back)rect(sa[3], sa[2], sa[5], sa[4]); //back
-			if(front)rect(sa[1], sa[0], sa[7], sa[6]); //front
-		}
-		
-		*/
-
 	public static void cube(float x, float y, float z, float size, boolean top, boolean bottom, boolean left, boolean right, boolean front, boolean back){
 
 		checkMesh();
@@ -208,9 +170,5 @@ public class ModelFactory{
 
 	static void rect(short a, short b, short c, short d){
 		meshBuilder.index(a, b, c, c, d, a);
-	}
-
-	public static void init(){
-
 	}
 }

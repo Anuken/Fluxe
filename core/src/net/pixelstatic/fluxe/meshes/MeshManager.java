@@ -1,52 +1,61 @@
 package net.pixelstatic.fluxe.meshes;
 
+import static net.pixelstatic.fluxe.world.World.chunksize;
+import static net.pixelstatic.fluxe.world.World.voxelsize;
+
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.graphics.g3d.Renderable;
 import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 
-public class ModelFactory{
-	private final static VertexInfo vertTmp1 = new VertexInfo();
-	private final static VertexInfo vertTmp2 = new VertexInfo();
-	private final static VertexInfo vertTmp3 = new VertexInfo();
-	private final static VertexInfo vertTmp4 = new VertexInfo();
-	private final static Color color = new Color(1, 0, 0, 1);
-	private final static Vector3[] vectors = new Vector3[8];
-	private final static MeshBuilder meshBuilder = new MeshBuilder();
-	private static Array<Mesh> meshes;
+public class MeshManager{
+	private final VertexInfo vertTmp1 = new VertexInfo();
+	private final VertexInfo vertTmp2 = new VertexInfo();
+	private final VertexInfo vertTmp3 = new VertexInfo();
+	private final VertexInfo vertTmp4 = new VertexInfo();
+	private final Color color = new Color(1, 0, 0, 1);
+	private final Vector3[] vectors = new Vector3[8];
+	private final MeshBuilder meshBuilder = new MeshBuilder();
 
-	static{
+	private Mesh currentMesh;
+	private Array<Mesh> meshes;
+	public Array<Renderable> renderables = new Array<Renderable>();
+
+	public MeshManager(){
 		for(int i = 0;i < vectors.length;i ++){
 			vectors[i] = new Vector3();
 		}
+
 	}
-	
-	public static void begin(){
+
+	public void begin(){
+	//	System.out.println("beginning");
 		if(meshes != null) throw new IllegalArgumentException("Call end() first.");
 		meshes = new Array<Mesh>();
 
 		//System.out.println("Beginning building of mesh.");
 	}
-	
-	public static Mesh[] end(){
+
+	public Mesh[] end(){
 		if(meshes == null) throw new IllegalArgumentException("Call begin() first.");
-		
+
 		if(meshBuilder.getAttributes() != null){
 			endMesh();
 		}
-		
+
 		//System.out.println("Ending building of mesh.\n\n");
-		
+
 		Mesh[] array = meshes.toArray(Mesh.class);
-		
+
 		meshes = null;
-		
+
 		return array;
 	}
 
-	public static Mesh[] generateVoxelMesh(int[][][] voxels, float px, float py, float pz, float size){
+	public Mesh[] generateVoxelMesh(int[][][] voxels, float px, float py, float pz, float size){
 		begin();
 		for(int x = 0;x < voxels.length;x ++){
 			for(int y = 0;y < voxels[x].length;y ++){
@@ -54,7 +63,7 @@ public class ModelFactory{
 
 					color.set(voxels[x][y][z]);
 
-					if(voxels[x][y][z] != 0) cube(px + x * size ,py + y * size,pz + z * size, size, //
+					if(voxels[x][y][z] != 0) cube(px + x * size, py + y * size, pz + z * size, size, //
 							!exists(voxels, x, y + 1, z), //top
 							!exists(voxels, x, y - 1, z), //bottom
 							!exists(voxels, x - 1, y, z), //left
@@ -64,17 +73,21 @@ public class ModelFactory{
 				}
 			}
 		}
-		
+
 		return end();
 	}
 
-	public static boolean exists(int[][][] array, int x, int y, int z){
+	public Mesh[] generateChunkMesh(int[][][] data, int x, int y, int z){
+		return generateVoxelMesh(data, x * voxelsize * chunksize, y * voxelsize * chunksize, z * voxelsize * chunksize, voxelsize);
+	}
+
+	public boolean exists(int[][][] array, int x, int y, int z){
 		if( !(x >= 0 && y >= 0 && z >= 0 && x < array.length && y < array[0].length && z < array[0][0].length)) return true;
 
 		return array[x][y][z] != 0;
 	}
 
-	public static void cube(float x, float y, float z, float size, boolean top, boolean bottom, boolean left, boolean right, boolean front, boolean back){
+	public void cube(float x, float y, float z, float size, boolean top, boolean bottom, boolean left, boolean right, boolean front, boolean back){
 
 		checkMesh();
 
@@ -100,11 +113,11 @@ public class ModelFactory{
 		if(back) rect(vectors[3], vectors[0], vectors[4], vectors[7], Normals.back); //back
 	}
 
-	private static void rect(Vector3 a, Vector3 b, Vector3 c, Vector3 d, Vector3 normal){
+	private void rect(Vector3 a, Vector3 b, Vector3 c, Vector3 d, Vector3 normal){
 		meshBuilder.rect(vertTmp1.set(a, normal, color, null).setUV(0f, 1f), vertTmp2.set(b, normal, color, null).setUV(1f, 1f), vertTmp3.set(c, normal, color, null).setUV(1f, 0f), vertTmp4.set(d, normal, color, null).setUV(0f, 0f));
 	}
 
-	private static void checkMesh(){
+	private void checkMesh(){
 		if(meshBuilder.getAttributes() == null){
 
 			meshBuilder.begin(Usage.Position | Usage.Normal | Usage.ColorPacked, GL20.GL_TRIANGLES);
@@ -119,15 +132,12 @@ public class ModelFactory{
 		}
 	}
 
-	private static void endMesh(){
+	private void endMesh(){
 		Mesh mesh = meshBuilder.end();
-		
-		//System.out.println("Ending a mesh.");
-		
 		meshes.add(mesh);
 	}
 
-	static void rect(short a, short b, short c, short d){
-		meshBuilder.index(a, b, c, c, d, a);
-	}
+	//void rect(short a, short b, short c, short d){
+	//	meshBuilder.index(a, b, c, c, d, a);
+	//}
 }

@@ -6,24 +6,35 @@ import net.pixelstatic.fluxe.Fluxe;
 import net.pixelstatic.fluxe.modules.Renderer;
 import net.pixelstatic.utils.modules.Module;
 
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Renderable;
-import com.badlogic.gdx.utils.*;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.AtomicQueue;
+import com.badlogic.gdx.utils.SnapshotArray;
 
 public class World extends Module<Fluxe>{
 	public static final int chunksize = 32;
 	public static final float voxelsize = 1;
 	public static final float loadrange = 500;
+	public static final int queuesize = 10000;
+	public static final int range = 2;
 
 	private ChunkMap chunks = new ChunkMap();
-	private Array<Chunk> chunklist = new Array<Chunk>();
-	private ChunkLoader chunkloader;
+	private SnapshotArray<Chunk> chunklist = new SnapshotArray<Chunk>();
 	private Thread chunkthread;
+	private ChunkLoader chunkloader;
+	private ChunkCoord tempcoord = new ChunkCoord();
+	private AtomicQueue<SyncLoadRequest> requests = new AtomicQueue<>(queuesize);
+	private Array<ChunkCoord> loadingchunks = new Array<ChunkCoord>();
 	private WorldFile file = new WorldFile(Paths.get(System.getProperty("user.dir"), "world"));
 	private Generator generator;
 	private Renderer renderer;
 	private PerspectiveCamera camera;
-	private Object lock = new Object();
+	private int camx, camy, camz;
 
 	@Override
 	public void init(){
@@ -31,99 +42,90 @@ public class World extends Module<Fluxe>{
 		camera = renderer.cam;
 		generator = new Generator(this);
 
-		long time = TimeUtils.millis();
-
-		int i = 2;
-
-		for(int x = -1 - i;x <= i;x ++){
-			for(int z = -1 - i;z <= i;z ++){
-				for(int y = 0;y < 3;y ++){
-					//	loadChunk(x, y, z);
-				}
-			}
-		}
-
-		long elapsed = TimeUtils.timeSinceMillis(time);
-
-		System.out.println("Chunk gen time in millis: " + elapsed);
-		System.out.println("Average chunk time: " + (elapsed / (i * 2f * i * 2f * 4f)));
-		System.out.println("Amount of chunks generated: " + (i * 2 * i * 2 * 3));
-
 		//loadChunk(0,0,1);
 		//loadChunk(0,0,2);
 
-		(chunkthread = new Thread((chunkloader = new ChunkLoader()))).start();
+		(chunkthread = new Thread(chunkloader = new ChunkLoader())).start();
+
 	}
 
 	@Override
 	public void update(){
+		camx = toChunkCoords(camera.position.x);
+		camy = toChunkCoords(camera.position.y);
+		camz = toChunkCoords(camera.position.z);
+
+
+		chunklist.begin();
 		for(Chunk chunk : chunklist){
-			if(chunk.getCenterPosition().dst(camera.position.x, camera.position.y, camera.position.z) > loadrange){
-				//unloadChunk(chunk);
-				//break;
+			if(isChunkOutOfRange(chunk.x, chunk.y, chunk.z)){
+				unloadChunk(chunk);
 			}
 		}
-
-		final int range = 1;
-
-		//System.out.println("loading chunks at range " + range);
-		final int camx = toChunkCoords(camera.position.x);
-		final int camy = toChunkCoords(camera.position.y);
-		final int camz = toChunkCoords(camera.position.z);
-
-		//if(Math.random() < 0.01){
-		//	System.out.println("Adding chunk coord to thread.");
-		//	chunkloader.queue.put(new ChunkCoord(0,0,0));
-		//chunkthread.interrupt();
-		//}
+		chunklist.end();
 
 		for(int x = -1 - range;x <= range;x ++){
 			for(int z = -1 - range;z <= range;z ++){
 				for(int y = -1 - range;y <= range;y ++){
 					if(chunks.get(x + camx, y + camy, z + camz) == null){
-						//System.out.println("loading chunk at " + x + ", " + y + ", " + z);
-						scheduleLoadChunk(x + camx, y + camy, z + camz);
+						if(loadingchunks.contains(tempcoord.set(x + camx, y + camy, z + camz), false)) continue; // chunk is already scheduled, skip
+						scheduleChunk(x + camx, y + camy, z + camz);
 					}
 				}
 			}
 		}
 
+		SyncLoadRequest request = null;
+		while((request = requests.poll()) != null){
+			loadChunkSync(request.data, request.coord);
+			return;
+		}
 	}
 
-	private void scheduleLoadChunk(int x, int y, int z){
-		chunkloader.queue.put(Pools.obtain(ChunkCoord.class).set(x, y, z));
+	void scheduleChunk(int x, int y, int z){
+		ChunkCoord coord = new ChunkCoord().set(x, y, z);
+
+		loadingchunks.add(coord);
+		chunkloader.queue.put(coord);
+
+		chunkthread.interrupt();
 	}
 
-	private class ChunkLoader implements Runnable{
-		AtomicQueue<ChunkCoord> queue = new AtomicQueue<>(32);
+	class ChunkLoader implements Runnable{
+		AtomicQueue<ChunkCoord> queue = new AtomicQueue<ChunkCoord>(queuesize);
 
-		@Override
 		public void run(){
 			while(true){
 				try{
-					ChunkCoord coords = null;
-					while((coords = queue.poll()) != null){
-						loadChunk(coords.x, coords.y, coords.z);
-						Pools.free(coords);
+					ChunkCoord coord = null;
+					while((coord = queue.poll()) != null){
+						//load data
+						
+						if(isChunkOutOfRange(coord.x,coord.y,coord.z)){
+							continue;
+						}
+						
+						int[][][] data = loadChunkAsync(coord.x, coord.y, coord.z);
+						
+						requests.put(new SyncLoadRequest(data, coord));
 					}
 
-					Thread.sleep(1000);
+					Thread.sleep(2000);
 				}catch(InterruptedException e){
-					System.out.println("Interuppted.");
+
 				}
 			}
 		}
 	}
+	
+	public boolean isChunkOutOfRange(int chunkx, int chunky, int chunkz){
+		return (!MathUtils.isEqual(chunkx, camx, range) || !MathUtils.isEqual(chunky, camy, range) || !MathUtils.isEqual(chunkz, camz, range));
+	}
 
 	public static class ChunkCoord{
-		public int x, y, z;
+		int x, y, z;
 
 		public ChunkCoord(){
-
-		}
-
-		public ChunkCoord(int x, int y, int z){
-			set(x, y, z);
 		}
 
 		public ChunkCoord set(int x, int y, int z){
@@ -131,6 +133,24 @@ public class World extends Module<Fluxe>{
 			this.y = y;
 			this.z = z;
 			return this;
+		}
+
+		@Override
+		public boolean equals(Object other){
+			if( !(other instanceof ChunkCoord)) return false;
+			ChunkCoord c = (ChunkCoord)other;
+
+			return c.x == x && c.y == y && c.z == z;
+		}
+	}
+
+	class SyncLoadRequest{
+		int[][][] data;
+		ChunkCoord coord;
+
+		public SyncLoadRequest(int[][][] data, ChunkCoord coord){
+			this.data = data;
+			this.coord = coord;
 		}
 	}
 
@@ -140,20 +160,48 @@ public class World extends Module<Fluxe>{
 		return r;
 	}
 
-	private void loadChunk(int x, int y, int z){
+	private void loadChunkSync(int[][][] data, ChunkCoord coord){
+		int x = coord.x, y = coord.y, z = coord.z;
+		
+		if(isChunkOutOfRange(x,y,z)){
+			loadingchunks.removeValue(coord, true);
+			return;
+		}
+
+		Mesh[] meshes = renderer.meshes.generateChunkMesh(data, coord.x, coord.y, coord.z);
+
+		Renderable[] renderables = new Renderable[meshes.length];
+
+		for(int i = 0;i < renderables.length;i ++){
+			Renderable renderable = new Renderable();
+			renderable.material = new Material();
+			renderable.meshPart.set("", meshes[i], 0, meshes[i].getNumIndices(), GL20.GL_TRIANGLES);
+			renderables[i] = renderable;
+		}
+
+		Chunk chunk = new Chunk(meshes, renderables, x, y, z, data);
+
+		for(Renderable renderable : chunk.getRenderables())
+			renderer.renderables.add(renderable);
+
+		chunklist.add(chunk);
+
+		chunks.put(chunk, x, y, z);
+		
+		//System.out.printf("Putting chunk: %d, %d, %d\n", x, y, z);
+
+		loadingchunks.removeValue(coord, true);
+
+		System.out.println("loading " + loadingchunks.size);
+	}
+
+	private int[][][] loadChunkAsync(int x, int y, int z){
 		if(chunks.get(x, y, z) != null) throw new RuntimeException("Chunk already loaded!");
 
 		int[][][] data = new int[chunksize][chunksize][chunksize];
 		generator.generate(x * chunksize, y * chunksize, z * chunksize, data);
 
-		Chunk chunk = new Chunk(x, y, z, data);
-
-		renderer.renderables.addAll(chunk.getRenderables());
-
-		chunklist.add(chunk);
-
-		chunks.put(chunk, x, y, z);
-		System.out.printf("Putting chunk: %d, %d, %d", x, y, z);
+		return data;
 	}
 
 	private void unloadChunk(Chunk chunk){

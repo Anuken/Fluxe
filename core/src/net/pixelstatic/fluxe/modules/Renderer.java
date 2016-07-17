@@ -1,6 +1,7 @@
 package net.pixelstatic.fluxe.modules;
 
 import net.pixelstatic.fluxe.Fluxe;
+import net.pixelstatic.fluxe.meshes.MeshManager;
 import net.pixelstatic.utils.graphics.FrameBufferMap;
 import net.pixelstatic.utils.modules.Module;
 
@@ -25,13 +26,14 @@ public class Renderer extends Module<Fluxe>{
 	public ModelBatch modelBatch, shadowBatch;
 	public FirstPersonCameraController camController;
 	public FrameBufferMap buffers = new FrameBufferMap();
+	public final MeshManager meshes = new MeshManager();
 	public DirectionalShadowLight shadowLight;
 	public int pixelscale = 1;
 	public int size = 100;
 	public Array<Renderable> renderables = new Array<Renderable>();
 	
+	
 	public Renderer(){
-		
 		
 		shadowLight = new DirectionalShadowLight(1440*2, 900*2, 20f, 20f, 1f, 100f);
 

@@ -1,6 +1,7 @@
 package net.pixelstatic.fluxe.world;
 
 import java.nio.file.Paths;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.pixelstatic.fluxe.Fluxe;
 import net.pixelstatic.fluxe.modules.Renderer;
@@ -12,7 +13,6 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Renderable;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.AtomicQueue;
 import com.badlogic.gdx.utils.SnapshotArray;
 
@@ -21,7 +21,7 @@ public class World extends Module<Fluxe>{
 	public static final float voxelsize = 1;
 	public static final float loadrange = 500;
 	public static final int queuesize = 10000;
-	public static final int range = 2;
+	public static final int range = 5;
 
 	private ChunkMap chunks = new ChunkMap();
 	private SnapshotArray<Chunk> chunklist = new SnapshotArray<Chunk>();
@@ -29,7 +29,7 @@ public class World extends Module<Fluxe>{
 	private ChunkLoader chunkloader;
 	private ChunkCoord tempcoord = new ChunkCoord();
 	private AtomicQueue<SyncLoadRequest> requests = new AtomicQueue<>(queuesize);
-	private Array<ChunkCoord> loadingchunks = new Array<ChunkCoord>();
+	private CopyOnWriteArrayList<ChunkCoord> loadingchunks = new CopyOnWriteArrayList<ChunkCoord>();
 	private WorldFile file = new WorldFile(Paths.get(System.getProperty("user.dir"), "world"));
 	private Generator generator;
 	private Renderer renderer;
@@ -68,7 +68,7 @@ public class World extends Module<Fluxe>{
 			for(int z = -1 - range;z <= range;z ++){
 				for(int y = -1 - range;y <= range;y ++){
 					if(chunks.get(x + camx, y + camy, z + camz) == null){
-						if(loadingchunks.contains(tempcoord.set(x + camx, y + camy, z + camz), false)) continue; // chunk is already scheduled, skip
+						if(loadingchunks.contains(tempcoord.set(x + camx, y + camy, z + camz))) continue; // chunk is already scheduled, skip
 						scheduleChunk(x + camx, y + camy, z + camz);
 					}
 				}
@@ -102,6 +102,7 @@ public class World extends Module<Fluxe>{
 						//load data
 						
 						if(isChunkOutOfRange(coord.x,coord.y,coord.z)){
+							loadingchunks.remove(coord);
 							continue;
 						}
 						
@@ -164,7 +165,7 @@ public class World extends Module<Fluxe>{
 		int x = coord.x, y = coord.y, z = coord.z;
 		
 		if(isChunkOutOfRange(x,y,z)){
-			loadingchunks.removeValue(coord, true);
+			loadingchunks.remove(coord);
 			return;
 		}
 
@@ -190,9 +191,9 @@ public class World extends Module<Fluxe>{
 		
 		//System.out.printf("Putting chunk: %d, %d, %d\n", x, y, z);
 
-		loadingchunks.removeValue(coord, true);
+		loadingchunks.remove(coord);
 
-		System.out.println("loading " + loadingchunks.size);
+		System.out.println("loading " + loadingchunks.size());
 	}
 
 	private int[][][] loadChunkAsync(int x, int y, int z){

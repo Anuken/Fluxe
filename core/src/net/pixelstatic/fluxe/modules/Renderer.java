@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight;
 import com.badlogic.gdx.graphics.g3d.shaders.DepthShader;
 import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider;
@@ -40,8 +41,8 @@ public class Renderer extends Module<Fluxe>{
 
 		environment = new Environment();
 		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
-		//environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
-		environment.add(shadowLight.set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
+		environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
+		//environment.add(shadowLight.set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
 
 		//environment.shadowMap = shadowLight;
 		
@@ -63,14 +64,16 @@ public class Renderer extends Module<Fluxe>{
 		
 		
 		camController = new FirstPersonCameraController(cam);
+		int size = 10;
 		
-		int[][][] voxels = new int[100][100][100];
+		int[][][] voxels = new int[size][size][size];
 		
 		for(int x = 0; x < voxels.length; x ++){
 			for(int y = 0; y < voxels[x].length; y ++){
 				for(int z = 0; z < voxels[x][y].length; z ++){
-					if(y < 4 || y < Math.sin((x+z)/10f)*20 )
-						voxels[x][y][z] = Color.rgba8888(Color.WHITE);
+					if(Math.random() < 0.4)voxels[x][y][z] = Color.rgba8888(Color.CORAL);
+					//if(y < 4 || y < Math.sin((x+z)/10f)*20 )
+					//	voxels[x][y][z] = Color.rgba8888(Color.CORAL);
 				}
 			}
 		}

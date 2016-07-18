@@ -32,11 +32,10 @@ public class MeshManager{
 	}
 
 	public void begin(){
-		//	System.out.println("beginning");
+		System.out.println("beginning");
 		if(meshes != null) throw new IllegalArgumentException("Call end() first.");
 		meshes = new Array<Mesh>();
 
-		System.out.println("Beginning building of mesh.");
 	}
 
 	public Mesh[] end(){
@@ -46,17 +45,20 @@ public class MeshManager{
 			endMesh();
 		}
 
-		System.out.println("Ending building of mesh.\n\n");
 
 		Mesh[] array = meshes.toArray(Mesh.class);
 
 		meshes = null;
+		
+		System.out.println("ending");
 
 		return array;
 	}
 
 	public Mesh[] generateVoxelMesh(int[][][] voxels, float px, float py, float pz, float size){
 		begin();
+		
+		
 
 		for(int x = 0;x < voxels.length;x ++){
 			for(int y = 0;y < voxels[x].length;y ++){
@@ -81,12 +83,32 @@ public class MeshManager{
 
 	public Model generateVoxelModel(int[][][] voxels){
 		Mesh[] meshes = generateVoxelMesh(voxels, 0, 0, 0, 1);
-
+		
+		new MarchingCubes().march(meshes[0], voxels);
+		
 		modelBuilder.begin();
 		int i = 0;
-		for(Mesh mesh : meshes)
+		for(Mesh mesh : meshes){
+		//	smoothMesh(mesh);
 			modelBuilder.part("mesh" + i ++, mesh, GL20.GL_TRIANGLES, new Material());
+		}
 		return modelBuilder.end();
+	}
+	
+	public void smoothMesh(Mesh mesh){
+		float[] vertices = new float[mesh.getVerticesBuffer().capacity()];
+		
+		//        0123    4     567
+		//format: XYZ - color - normalXYZ
+		
+		mesh.getVertices(vertices);
+		
+		for(int i = 0; i < 9; i ++){
+			System.out.println(vertices[i]);
+		}
+		
+		System.out.println("\n\n");
+		mesh.setVertices(vertices);
 	}
 
 	public EnumSet<Direction> getFlags(int[][][] voxels, int x, int y, int z){
@@ -141,7 +163,7 @@ public class MeshManager{
 	private void checkMesh(){
 		if(meshBuilder.getAttributes() == null){
 
-			meshBuilder.begin(Usage.Position | Usage.Normal | Usage.ColorPacked, GL20.GL_TRIANGLES);
+			meshBuilder.begin(Usage.Position | Usage.Normal /* Usage.ColorPacked*/, GL20.GL_TRIANGLES);
 			//System.out.println("Beginning first mesh build");
 
 		}else if(meshBuilder.getNumIndices() >= Short.MAX_VALUE + 16000 /*if the vertices will exceed max vertices soon*/){
@@ -149,13 +171,14 @@ public class MeshManager{
 
 			//System.out.println("Adding new mesh.");
 
-			meshBuilder.begin(Usage.Position | Usage.Normal | Usage.ColorPacked, GL20.GL_TRIANGLES);
+			meshBuilder.begin(Usage.Position | Usage.Normal /* Usage.ColorPacked*/, GL20.GL_TRIANGLES);
 		}
 	}
 
 	private void endMesh(){
 		Mesh mesh = meshBuilder.end();
 		meshes.add(mesh);
+		System.out.println("End mesh. Adding to array.");
 	}
 
 	//void rect(short a, short b, short c, short d){

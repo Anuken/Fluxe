@@ -320,42 +320,48 @@ public class MarchingCubes{
 			for(int j = 0;j < height - 1;j ++){
 				for(int i = 0;i < width - 1;i ++){
 					vec3[] vertlist = new vec3[12];
+					
 
 					float isolevel = 0.5f;
 					int cubeindex = 0;
-					if(grid[i][j][k] == 0) cubeindex |= 1;
-					if(grid[i][j + 1][k] == 0) cubeindex |= 2;
-					if(grid[i + 1][j + 1][k] == 0) cubeindex |= 4;
-					if(grid[i + 1][j][k] == 0) cubeindex |= 8;
-					if(grid[i][j][k + 1] == 0) cubeindex |= 16;
-					if(grid[i][j + 1][k + 1] == 0) cubeindex |= 32;
-					if(grid[i + 1][j + 1][k + 1] == 0) cubeindex |= 64;
-					if(grid[i + 1][j][k + 1] == 0) cubeindex |= 128;
+					
+					if(grid[i][j+1][k] == 0) cubeindex |= 1;
+					if(grid[i][j][k] == 0) cubeindex |= 2;
+					
+					if(grid[i + 1][j][k] == 0) cubeindex |= 4;
+					if(grid[i + 1][j+1][k] == 0) cubeindex |= 8;
+					
+					if(grid[i][j+1][k + 1] == 0) cubeindex |= 16;
+					if(grid[i][j][k + 1] == 0) cubeindex |= 32;
+					if(grid[i + 1][j][k + 1] == 0) cubeindex |= 64;
+					if(grid[i + 1][j+1][k + 1] == 0) cubeindex |= 128;
 
 					if(edgeTable[cubeindex] == 0) continue;
 
-					if((edgeTable[cubeindex] & 1) != 0) vertlist[0] = VertexInterp2(isolevel, new vec3(i, j, k), new vec3(i, j + 1, k), grid[i][j][k], grid[i][j + 1][k]);
-					if((edgeTable[cubeindex] & 2) != 0) vertlist[1] = VertexInterp2(isolevel, new vec3(i, j + 1, k), new vec3(i + 1, j + 1, k), grid[i][j + 1][k], grid[i + 1][j + 1][k]);
-					if((edgeTable[cubeindex] & 4) != 0) vertlist[2] = VertexInterp2(isolevel, new vec3(i + 1, j + 1, k), new vec3(i + 1, j, k), grid[i + 1][j + 1][k], grid[i + 1][j][k]);
-					if((edgeTable[cubeindex] & 8) != 0) vertlist[3] = VertexInterp2(isolevel, new vec3(i + 1, j, k), new vec3(i, j, k), grid[i + 1][j][k], grid[i][j][k]);
-					if((edgeTable[cubeindex] & 16) != 0) vertlist[4] = VertexInterp2(isolevel, new vec3(i, j, k + 1), new vec3(i, j + 1, k + 1), grid[i][j][k + 1], grid[i][j + 1][k + 1]);
-					if((edgeTable[cubeindex] & 32) != 0) vertlist[5] = VertexInterp2(isolevel, new vec3(i, j + 1, k + 1), new vec3(i + 1, j + 1, k + 1), grid[i][j + 1][k + 1], grid[i + 1][j + 1][k + 1]);
-					if((edgeTable[cubeindex] & 64) != 0) vertlist[6] = VertexInterp2(isolevel, new vec3(i + 1, j + 1, k + 1), new vec3(i + 1, j, k + 1), grid[i + 1][j + 1][k + 1], grid[i + 1][j][k + 1]);
-					if((edgeTable[cubeindex] & 128) != 0) vertlist[7] = VertexInterp2(isolevel, new vec3(i + 1, j, k + 1), new vec3(i, j, k + 1), grid[i + 1][j][k + 1], grid[i][j][k + 1]);
-					if((edgeTable[cubeindex] & 256) != 0) vertlist[8] = VertexInterp2(isolevel, new vec3(i, j, k), new vec3(i, j, k + 1), grid[i][j][k], grid[i][j][k + 1]);
-					if((edgeTable[cubeindex] & 512) != 0) vertlist[9] = VertexInterp2(isolevel, new vec3(i, j + 1, k), new vec3(i, j + 1, k + 1), grid[i][j + 1][k], grid[i][j + 1][k + 1]);
-					if((edgeTable[cubeindex] & 1024) != 0) vertlist[10] = VertexInterp2(isolevel, new vec3(i + 1, j + 1, k), new vec3(i + 1, j + 1, k + 1), grid[i + 1][j + 1][k], grid[i + 1][j + 1][k + 1]);
-					if((edgeTable[cubeindex] & 2048) != 0) vertlist[11] = VertexInterp2(isolevel, new vec3(i + 1, j, k), new vec3(i + 1, j, k + 1), grid[i + 1][j][k], grid[i + 1][j][k + 1]);
+					if((edgeTable[cubeindex] & 1) != 0) vertlist[0] = VertexInterp2(isolevel, new vec3(i, j+1, k), new vec3(i, j, k), grid[i][j+1][k], grid[i][j][k]);
+					if((edgeTable[cubeindex] & 2) != 0) vertlist[1] = VertexInterp2(isolevel, new vec3(i, j, k), new vec3(i + 1, j, k), grid[i][j][k], grid[i + 1][j][k]);
+					if((edgeTable[cubeindex] & 4) != 0) vertlist[2] = VertexInterp2(isolevel, new vec3(i + 1, j, k), new vec3(i + 1, j+1, k), grid[i + 1][j][k], grid[i + 1][j+1][k]);
+					if((edgeTable[cubeindex] & 8) != 0) vertlist[3] = VertexInterp2(isolevel, new vec3(i + 1, j+1, k), new vec3(i, j+1, k), grid[i + 1][j+1][k], grid[i][j+1][k]);
+					if((edgeTable[cubeindex] & 16) != 0) vertlist[4] = VertexInterp2(isolevel, new vec3(i, j+1, k + 1), new vec3(i, j, k + 1), grid[i][j+1][k + 1], grid[i][j][k + 1]);
+					if((edgeTable[cubeindex] & 32) != 0) vertlist[5] = VertexInterp2(isolevel, new vec3(i, j, k + 1), new vec3(i + 1, j, k + 1), grid[i][j][k + 1], grid[i + 1][j][k + 1]);
+					if((edgeTable[cubeindex] & 64) != 0) vertlist[6] = VertexInterp2(isolevel, new vec3(i + 1, j, k + 1), new vec3(i + 1, j+1, k + 1), grid[i + 1][j][k + 1], grid[i + 1][j+1][k + 1]);
+					if((edgeTable[cubeindex] & 128) != 0) vertlist[7] = VertexInterp2(isolevel, new vec3(i + 1, j+1, k + 1), new vec3(i, j+1, k + 1), grid[i + 1][j+1][k + 1], grid[i][j+1][k + 1]);
+					if((edgeTable[cubeindex] & 256) != 0) vertlist[8] = VertexInterp2(isolevel, new vec3(i, j+1, k), new vec3(i, j+1, k + 1), grid[i][j+1][k], grid[i][j+1][k + 1]);
+					if((edgeTable[cubeindex] & 512) != 0) vertlist[9] = VertexInterp2(isolevel, new vec3(i, j, k), new vec3(i, j, k + 1), grid[i][j][k], grid[i][j][k + 1]);
+					if((edgeTable[cubeindex] & 1024) != 0) vertlist[10] = VertexInterp2(isolevel, new vec3(i + 1, j, k), new vec3(i + 1, j, k + 1), grid[i + 1][j][k], grid[i + 1][j][k + 1]);
+					if((edgeTable[cubeindex] & 2048) != 0) vertlist[11] = VertexInterp2(isolevel, new vec3(i + 1, j+1, k), new vec3(i + 1, j+1, k + 1), grid[i + 1][j+1][k], grid[i + 1][j+1][k + 1]);
 
 					/* Create the triangle */
 					for(int id = 0;triTable[cubeindex][id] != -1;id += 3){
-						int key_out1 = 0, key_out2 = 0, key_out3 = 0;
-						key_out1 = octtree.insert(vertlist[triTable[cubeindex][id]].x, vertlist[triTable[cubeindex][id]].y, vertlist[triTable[cubeindex][id]].z, key_out1, vertices);
-						key_out2 = octtree.insert(vertlist[triTable[cubeindex][id + 1]].x, vertlist[triTable[cubeindex][id + 1]].y, vertlist[triTable[cubeindex][id + 1]].z, key_out2, vertices);
-						key_out3 = octtree.insert(vertlist[triTable[cubeindex][id + 2]].x, vertlist[triTable[cubeindex][id + 2]].y, vertlist[triTable[cubeindex][id + 2]].z, key_out3, vertices);
+						
+						int key_out1 = octtree.insert(vertlist[triTable[cubeindex][id]].x, vertlist[triTable[cubeindex][id]].y, vertlist[triTable[cubeindex][id]].z, 0, vertices);
+						int key_out2 = octtree.insert(vertlist[triTable[cubeindex][id + 1]].x, vertlist[triTable[cubeindex][id + 1]].y, vertlist[triTable[cubeindex][id + 1]].z, 0, vertices);
+						int key_out3 = octtree.insert(vertlist[triTable[cubeindex][id + 2]].x, vertlist[triTable[cubeindex][id + 2]].y, vertlist[triTable[cubeindex][id + 2]].z, 0, vertices);
+						
 						indices.add((short)key_out1);
 						indices.add((short)key_out2);
 						indices.add((short)key_out3);
+						
 					}
 				}
 			}
@@ -370,13 +376,19 @@ public class MarchingCubes{
 		
 		short[] newindices = indices.toArray();
 		
+		
+		
 		float[] normals = addNormals(vertices.toArray());//createNormals(vertices.toArray(), newindices);
+		
 		
 		mesh.setVertices(normals);
 		mesh.setIndices(newindices);
 
-		for(int i = 0;i < 12;i ++)
-			System.out.println(normals[i]);
+		for(int i = 0;i < 12;i ++){
+			//newindices[i]*=2;
+		//	System.out.println(normals[i] + " [" + newindices[i] + "] ");
+		//	System.out.println();
+		}
 
 		// short[] indices
 
@@ -416,7 +428,11 @@ public class MarchingCubes{
 		for(int i = 0; i < (vertices.length)*2; i ++){
 
 			//if(i%6<3)System.out.println( i + ": " + (i%3 + (i/6)*3));
-			if(i%6<3) normals[i] = vertices[i%3 + (i/6)*3];
+			if(i%6<3){
+				normals[i] = vertices[i%3 + (i/6)*3];
+			}else{
+				normals[i] = -0.5f;
+			}
 		}
 		return normals;
 	}
@@ -539,7 +555,7 @@ public class MarchingCubes{
 			float vertex_y = vertices.get(3 * key + 1);
 			float vertex_z = vertices.get(3 * key + 2);
 
-			// incert
+			// insert
 			if(vertex_z < z + dz / 2){
 				if(vertex_y < y + dy / 2){
 					if(vertex_x < x + dx / 2){
@@ -607,29 +623,29 @@ public class MarchingCubes{
 			if(new_z < z + dz / 2){
 				if(new_y < y + dy / 2){
 					if(new_x < x + dx / 2){
-						swd.insert(new_x, new_y, new_z, key_out, vertices);
+						key_out = swd.insert(new_x, new_y, new_z, key_out, vertices);
 					}else{
-						sed.insert(new_x, new_y, new_z, key_out, vertices);
+						key_out = sed.insert(new_x, new_y, new_z, key_out, vertices);
 					}
 				}else{
 					if(new_x < x + dx / 2){
-						nwd.insert(new_x, new_y, new_z, key_out, vertices);
+						key_out = nwd.insert(new_x, new_y, new_z, key_out, vertices);
 					}else{
-						ned.insert(new_x, new_y, new_z, key_out, vertices);
+						key_out = ned.insert(new_x, new_y, new_z, key_out, vertices);
 					}
 				}
 			}else{
 				if(new_y < y + dy / 2){
 					if(new_x < x + dx / 2){
-						swu.insert(new_x, new_y, new_z, key_out, vertices);
+						key_out = swu.insert(new_x, new_y, new_z, key_out, vertices);
 					}else{
-						seu.insert(new_x, new_y, new_z, key_out, vertices);
+						key_out = seu.insert(new_x, new_y, new_z, key_out, vertices);
 					}
 				}else{
 					if(new_x < x + dx / 2){
-						nwu.insert(new_x, new_y, new_z, key_out, vertices);
+						key_out = nwu.insert(new_x, new_y, new_z, key_out, vertices);
 					}else{
-						neu.insert(new_x, new_y, new_z, key_out, vertices);
+						key_out = neu.insert(new_x, new_y, new_z, key_out, vertices);
 					}
 				}
 			}

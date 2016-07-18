@@ -1,13 +1,14 @@
 package net.pixelstatic.fluxe.meshes;
 
-import static net.pixelstatic.fluxe.world.World.chunksize;
-import static net.pixelstatic.fluxe.world.World.voxelsize;
+import java.util.EnumSet;
 
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.g3d.Renderable;
+import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 
@@ -19,10 +20,9 @@ public class MeshManager{
 	private final Color color = new Color(1, 0, 0, 1);
 	private final Vector3[] vectors = new Vector3[8];
 	private final MeshBuilder meshBuilder = new MeshBuilder();
+	private final ModelBuilder modelBuilder = new ModelBuilder();
 
-	private Mesh currentMesh;
 	private Array<Mesh> meshes;
-	public Array<Renderable> renderables = new Array<Renderable>();
 
 	public MeshManager(){
 		for(int i = 0;i < vectors.length;i ++){
@@ -32,11 +32,11 @@ public class MeshManager{
 	}
 
 	public void begin(){
-	//	System.out.println("beginning");
+		//	System.out.println("beginning");
 		if(meshes != null) throw new IllegalArgumentException("Call end() first.");
 		meshes = new Array<Mesh>();
 
-		//System.out.println("Beginning building of mesh.");
+		System.out.println("Beginning building of mesh.");
 	}
 
 	public Mesh[] end(){
@@ -46,7 +46,7 @@ public class MeshManager{
 			endMesh();
 		}
 
-		//System.out.println("Ending building of mesh.\n\n");
+		System.out.println("Ending building of mesh.\n\n");
 
 		Mesh[] array = meshes.toArray(Mesh.class);
 
@@ -57,13 +57,15 @@ public class MeshManager{
 
 	public Mesh[] generateVoxelMesh(int[][][] voxels, float px, float py, float pz, float size){
 		begin();
+
 		for(int x = 0;x < voxels.length;x ++){
 			for(int y = 0;y < voxels[x].length;y ++){
 				for(int z = 0;z < voxels[x][y].length;z ++){
+					EnumSet<Direction> flags = getFlags(voxels, x, y, z);
 
 					color.set(voxels[x][y][z]);
 
-					if(voxels[x][y][z] != 0) cube(px + x * size, py + y * size, pz + z * size, size, //
+					if(voxels[x][y][z] != 0) cube(px + x * size - size * voxels.length / 2, py + y * size - size * voxels[0].length / 2, pz + z * size - size * voxels[0][0].length / 2, size, //
 							!exists(voxels, x, y + 1, z), //top
 							!exists(voxels, x, y - 1, z), //bottom
 							!exists(voxels, x - 1, y, z), //left
@@ -77,12 +79,31 @@ public class MeshManager{
 		return end();
 	}
 
-	public Mesh[] generateChunkMesh(int[][][] data, int x, int y, int z){
-		return generateVoxelMesh(data, x * voxelsize * chunksize, y * voxelsize * chunksize, z * voxelsize * chunksize, voxelsize);
+	public Model generateVoxelModel(int[][][] voxels){
+		Mesh[] meshes = generateVoxelMesh(voxels, 0, 0, 0, 1);
+
+		modelBuilder.begin();
+		int i = 0;
+		for(Mesh mesh : meshes)
+			modelBuilder.part("mesh" + i ++, mesh, GL20.GL_TRIANGLES, new Material());
+		return modelBuilder.end();
+	}
+
+	public EnumSet<Direction> getFlags(int[][][] voxels, int x, int y, int z){
+		EnumSet<Direction> set = EnumSet.noneOf(Direction.class);
+
+		if( !exists(voxels, x, y + 1, z)) set.add(Direction.top); //top
+		if( !exists(voxels, x, y - 1, z)) set.add(Direction.bottom); //bottom
+		if( !exists(voxels, x - 1, y, z)) set.add(Direction.left); //left
+		if( !exists(voxels, x + 1, y, z)) set.add(Direction.right); //right
+		if( !exists(voxels, x, y, z + 1)) set.add(Direction.front); //front
+		if( !exists(voxels, x, y, z - 1)) set.add(Direction.back);//back
+
+		return set;
 	}
 
 	public boolean exists(int[][][] array, int x, int y, int z){
-		if( !(x >= 0 && y >= 0 && z >= 0 && x < array.length && y < array[0].length && z < array[0][0].length)) return true;
+		if( !(x >= 0 && y >= 0 && z >= 0 && x < array.length && y < array[0].length && z < array[0][0].length)) return false;
 
 		return array[x][y][z] != 0;
 	}

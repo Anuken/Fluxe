@@ -300,7 +300,7 @@ public class MarchingCubes{
 
 	int width = 50, height = 50, depth = 50;
 
-	void march(Mesh mesh, int[][][] grid){
+	public void march(Mesh mesh, int[][][] grid){
 		width = grid.length;
 		height = grid[0].length;
 		depth = grid[0][0].length;
@@ -376,9 +376,8 @@ public class MarchingCubes{
 		
 		short[] newindices = indices.toArray();
 		
-		
-		
-		float[] normals = addNormals(vertices.toArray());//createNormals(vertices.toArray(), newindices);
+
+		float[] normals = addNormals(vertices.toArray(), newindices);//createNormals(vertices.toArray(), newindices);
 		
 		
 		mesh.setVertices(normals);
@@ -423,17 +422,63 @@ public class MarchingCubes{
 
 	}
 	
-	float[] addNormals(float[] vertices){
+	float[] addNormals(float[] vertices, short[] indices){
 		float[] normals = new float[2 * vertices.length];
+		
+		Vector3 v1 = new Vector3();
+		Vector3 v2 = new Vector3();
+		Vector3 v3 = new Vector3();
+		
+		for(int i = 0; i < vertices.length/3-3; i ++){
+			int off = i*3;
+			
+			int a = i*3;
+			int b = (i+1)*3;
+			int c = (i+2)*3;
+			
+			float x1 = vertices[a+0];
+			float y1 = vertices[a+1];
+			float z1 = vertices[a+2];
+			
+			float x2 = vertices[b+0];
+			float y2 = vertices[b+1];
+			float z2 = vertices[b+2];
+			
+			float x3 = vertices[c+0];
+			float y3 = vertices[c+1];
+			float z3 = vertices[c+2];
+			
+			/*
+			float dx1 = x2 - x1;
+			float dx2 = x3 - x1;
+			float dy1 = y2 - y1;
+			float dy2 = y3 - y1;
+			float dz1 = z2 - z1;
+			float dz2 = z3 - z1;
+			*/
+			v1.set(x3 - x1, y3 - y1, z3 - z1).crs(x2 - x1, y2 - y1, z2 - z1).nor();
+			/*
+			int noff = i*6;
+			normals[noff+3] = v1.x;
+			normals[noff+4] = v1.y;
+			normals[noff+5] = v1.z;
+			
+			normals[noff+3+3] = v1.x;
+			normals[noff+4+3] = v1.y;
+			normals[noff+5+3] = v1.z;
+			
+			normals[noff+3+6] = v1.x;
+			normals[noff+4+6] = v1.y;
+			normals[noff+5+6] = v1.z;
+			*/
+		}
+		
 		for(int i = 0; i < (vertices.length)*2; i ++){
-
-			//if(i%6<3)System.out.println( i + ": " + (i%3 + (i/6)*3));
 			if(i%6<3){
 				normals[i] = vertices[i%3 + (i/6)*3];
-			}else{
-				normals[i] = -0.5f;
 			}
 		}
+		
 		return normals;
 	}
 
@@ -495,17 +540,7 @@ public class MarchingCubes{
 		printf("num NaNs = %d\n", numnans);
 
 		// normalize final normal
-		for(int i = 0;i < nVertices;i ++){
-			float dx = normals[3 * i + 0];
-			float dy = normals[3 * i + 1];
-			float dz = normals[3 * i + 2];
-			float dr = (float)Math.sqrt(dx * dx + dy * dy + dz * dz);
-			float idr = 1.0f / dr;
 
-			normals[3 * i + 0] *= idr;
-			normals[3 * i + 1] *= idr;
-			normals[3 * i + 2] *= idr;
-		}
 		
 		return normals;
 	}

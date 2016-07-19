@@ -31,9 +31,10 @@ public class Renderer extends Module<Fluxe>{
 	public final MeshManager meshes = new MeshManager();
 	public DirectionalShadowLight shadowLight;
 	public int pixelscale = 1;
-	public int size = 100;
+	public int size = 30;
 	public Array<Model> models = new Array<Model>();
 	public Array<ModelInstance> modelInstances = new Array<ModelInstance>();
+	int[][][] voxels = new int[size][size][size];
 	
 	public Renderer(){
 		
@@ -64,21 +65,25 @@ public class Renderer extends Module<Fluxe>{
 		
 		
 		camController = new FirstPersonCameraController(cam);
-		int size = 50;
 		
-		int[][][] voxels = new int[size][size][size];
 		
 		for(int x = 0; x < voxels.length; x ++){
 			for(int y = 0; y < voxels[x].length; y ++){
 				for(int z = 0; z < voxels[x][y].length; z ++){
 					//if(Math.random() < 0.4)voxels[x][y][z] = Color.rgba8888(Color.CORAL);
-					if(y < 4 || y < Math.sin((x+z)/10f)*20 )
-						voxels[x][y][z] = Color.rgba8888(Color.CORAL);
+					if(Vector3.dst(size/2, size/2, size/2, x, y, z) < size/2-1)
+					voxels[x][y][z] = Color.rgba8888(Color.CORAL);
+					
+					if(Vector3.dst(size/2, size/2, size/2, x, y, z) < 6)
+						voxels[x][y][z] = 0;
+					//if(y < 4 || y < Math.sin((x+z)/10f)*20 )
+					//	voxels[x][y][z] = Color.rgba8888(Color.CORAL);
 				}
 			}
 		}
 		
 		Model model = meshes.generateVoxelModel(voxels);
+		
 		
 		add(model);
 		
@@ -98,6 +103,7 @@ public class Renderer extends Module<Fluxe>{
 		if(Gdx.input.isKeyJustPressed(Keys.ESCAPE)){
 			Gdx.app.exit();
 		}
+
 		
 		camController.update();
 		

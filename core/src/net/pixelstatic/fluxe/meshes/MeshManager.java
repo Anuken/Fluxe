@@ -90,7 +90,7 @@ public class MeshManager{
 		int i = 0;
 		for(Mesh mesh : meshes){
 		//	smoothMesh(mesh);
-			modelBuilder.part("mesh" + i ++, mesh, GL20.GL_TRIANGLES, new Material());
+			modelBuilder.part("mesh" + i ++, mesh, GL20.GL_LINES, new Material());
 		}
 		return modelBuilder.end();
 	}
@@ -163,7 +163,7 @@ public class MeshManager{
 	private void checkMesh(){
 		if(meshBuilder.getAttributes() == null){
 
-			meshBuilder.begin(Usage.Position | Usage.Normal /* Usage.ColorPacked*/, GL20.GL_TRIANGLES);
+			meshBuilder.begin(Usage.Position | Usage.Normal /* Usage.ColorPacked*/, GL20.GL_LINES);
 			//System.out.println("Beginning first mesh build");
 
 		}else if(meshBuilder.getNumIndices() >= Short.MAX_VALUE + 16000 /*if the vertices will exceed max vertices soon*/){
@@ -171,7 +171,7 @@ public class MeshManager{
 
 			//System.out.println("Adding new mesh.");
 
-			meshBuilder.begin(Usage.Position | Usage.Normal /* Usage.ColorPacked*/, GL20.GL_TRIANGLES);
+			meshBuilder.begin(Usage.Position | Usage.Normal /* Usage.ColorPacked*/, GL20.GL_LINES);
 		}
 	}
 

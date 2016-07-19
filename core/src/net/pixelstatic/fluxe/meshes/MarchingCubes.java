@@ -320,48 +320,47 @@ public class MarchingCubes{
 			for(int j = 0;j < height - 1;j ++){
 				for(int i = 0;i < width - 1;i ++){
 					vec3[] vertlist = new vec3[12];
-					
 
 					float isolevel = 0.5f;
 					int cubeindex = 0;
-					
-					if(grid[i][j+1][k] == 0) cubeindex |= 1;
+
+					if(grid[i][j + 1][k] == 0) cubeindex |= 1;
 					if(grid[i][j][k] == 0) cubeindex |= 2;
-					
+
 					if(grid[i + 1][j][k] == 0) cubeindex |= 4;
-					if(grid[i + 1][j+1][k] == 0) cubeindex |= 8;
-					
-					if(grid[i][j+1][k + 1] == 0) cubeindex |= 16;
+					if(grid[i + 1][j + 1][k] == 0) cubeindex |= 8;
+
+					if(grid[i][j + 1][k + 1] == 0) cubeindex |= 16;
 					if(grid[i][j][k + 1] == 0) cubeindex |= 32;
 					if(grid[i + 1][j][k + 1] == 0) cubeindex |= 64;
-					if(grid[i + 1][j+1][k + 1] == 0) cubeindex |= 128;
+					if(grid[i + 1][j + 1][k + 1] == 0) cubeindex |= 128;
 
 					if(edgeTable[cubeindex] == 0) continue;
 
-					if((edgeTable[cubeindex] & 1) != 0) vertlist[0] = VertexInterp2(isolevel, new vec3(i, j+1, k), new vec3(i, j, k), grid[i][j+1][k], grid[i][j][k]);
+					if((edgeTable[cubeindex] & 1) != 0) vertlist[0] = VertexInterp2(isolevel, new vec3(i, j + 1, k), new vec3(i, j, k), grid[i][j + 1][k], grid[i][j][k]);
 					if((edgeTable[cubeindex] & 2) != 0) vertlist[1] = VertexInterp2(isolevel, new vec3(i, j, k), new vec3(i + 1, j, k), grid[i][j][k], grid[i + 1][j][k]);
-					if((edgeTable[cubeindex] & 4) != 0) vertlist[2] = VertexInterp2(isolevel, new vec3(i + 1, j, k), new vec3(i + 1, j+1, k), grid[i + 1][j][k], grid[i + 1][j+1][k]);
-					if((edgeTable[cubeindex] & 8) != 0) vertlist[3] = VertexInterp2(isolevel, new vec3(i + 1, j+1, k), new vec3(i, j+1, k), grid[i + 1][j+1][k], grid[i][j+1][k]);
-					if((edgeTable[cubeindex] & 16) != 0) vertlist[4] = VertexInterp2(isolevel, new vec3(i, j+1, k + 1), new vec3(i, j, k + 1), grid[i][j+1][k + 1], grid[i][j][k + 1]);
+					if((edgeTable[cubeindex] & 4) != 0) vertlist[2] = VertexInterp2(isolevel, new vec3(i + 1, j, k), new vec3(i + 1, j + 1, k), grid[i + 1][j][k], grid[i + 1][j + 1][k]);
+					if((edgeTable[cubeindex] & 8) != 0) vertlist[3] = VertexInterp2(isolevel, new vec3(i + 1, j + 1, k), new vec3(i, j + 1, k), grid[i + 1][j + 1][k], grid[i][j + 1][k]);
+					if((edgeTable[cubeindex] & 16) != 0) vertlist[4] = VertexInterp2(isolevel, new vec3(i, j + 1, k + 1), new vec3(i, j, k + 1), grid[i][j + 1][k + 1], grid[i][j][k + 1]);
 					if((edgeTable[cubeindex] & 32) != 0) vertlist[5] = VertexInterp2(isolevel, new vec3(i, j, k + 1), new vec3(i + 1, j, k + 1), grid[i][j][k + 1], grid[i + 1][j][k + 1]);
-					if((edgeTable[cubeindex] & 64) != 0) vertlist[6] = VertexInterp2(isolevel, new vec3(i + 1, j, k + 1), new vec3(i + 1, j+1, k + 1), grid[i + 1][j][k + 1], grid[i + 1][j+1][k + 1]);
-					if((edgeTable[cubeindex] & 128) != 0) vertlist[7] = VertexInterp2(isolevel, new vec3(i + 1, j+1, k + 1), new vec3(i, j+1, k + 1), grid[i + 1][j+1][k + 1], grid[i][j+1][k + 1]);
-					if((edgeTable[cubeindex] & 256) != 0) vertlist[8] = VertexInterp2(isolevel, new vec3(i, j+1, k), new vec3(i, j+1, k + 1), grid[i][j+1][k], grid[i][j+1][k + 1]);
+					if((edgeTable[cubeindex] & 64) != 0) vertlist[6] = VertexInterp2(isolevel, new vec3(i + 1, j, k + 1), new vec3(i + 1, j + 1, k + 1), grid[i + 1][j][k + 1], grid[i + 1][j + 1][k + 1]);
+					if((edgeTable[cubeindex] & 128) != 0) vertlist[7] = VertexInterp2(isolevel, new vec3(i + 1, j + 1, k + 1), new vec3(i, j + 1, k + 1), grid[i + 1][j + 1][k + 1], grid[i][j + 1][k + 1]);
+					if((edgeTable[cubeindex] & 256) != 0) vertlist[8] = VertexInterp2(isolevel, new vec3(i, j + 1, k), new vec3(i, j + 1, k + 1), grid[i][j + 1][k], grid[i][j + 1][k + 1]);
 					if((edgeTable[cubeindex] & 512) != 0) vertlist[9] = VertexInterp2(isolevel, new vec3(i, j, k), new vec3(i, j, k + 1), grid[i][j][k], grid[i][j][k + 1]);
 					if((edgeTable[cubeindex] & 1024) != 0) vertlist[10] = VertexInterp2(isolevel, new vec3(i + 1, j, k), new vec3(i + 1, j, k + 1), grid[i + 1][j][k], grid[i + 1][j][k + 1]);
-					if((edgeTable[cubeindex] & 2048) != 0) vertlist[11] = VertexInterp2(isolevel, new vec3(i + 1, j+1, k), new vec3(i + 1, j+1, k + 1), grid[i + 1][j+1][k], grid[i + 1][j+1][k + 1]);
+					if((edgeTable[cubeindex] & 2048) != 0) vertlist[11] = VertexInterp2(isolevel, new vec3(i + 1, j + 1, k), new vec3(i + 1, j + 1, k + 1), grid[i + 1][j + 1][k], grid[i + 1][j + 1][k + 1]);
 
 					/* Create the triangle */
 					for(int id = 0;triTable[cubeindex][id] != -1;id += 3){
-						
+
 						int key_out1 = octtree.insert(vertlist[triTable[cubeindex][id]].x, vertlist[triTable[cubeindex][id]].y, vertlist[triTable[cubeindex][id]].z, 0, vertices);
 						int key_out2 = octtree.insert(vertlist[triTable[cubeindex][id + 1]].x, vertlist[triTable[cubeindex][id + 1]].y, vertlist[triTable[cubeindex][id + 1]].z, 0, vertices);
 						int key_out3 = octtree.insert(vertlist[triTable[cubeindex][id + 2]].x, vertlist[triTable[cubeindex][id + 2]].y, vertlist[triTable[cubeindex][id + 2]].z, 0, vertices);
-						
+
 						indices.add((short)key_out1);
 						indices.add((short)key_out2);
 						indices.add((short)key_out3);
-						
+
 					}
 				}
 			}
@@ -373,20 +372,19 @@ public class MarchingCubes{
 		printf("  %dx%dx%d = %d voxels\n", width, height, depth, depth * height * depth);
 		printf("  %d vertices\n", (int)vertices.size);
 		printf("  %d triangles\n", (int)indices.size / 3);
-		
+
 		short[] newindices = indices.toArray();
-		
 
 		float[] normals = addNormals(vertices.toArray(), newindices);//createNormals(vertices.toArray(), newindices);
-		
-		
+
 		mesh.setVertices(normals);
 		mesh.setIndices(newindices);
 
-		for(int i = 0;i < 12;i ++){
+		for(int i = 0;i < normals.length;i ++){
 			//newindices[i]*=2;
-		//	System.out.println(normals[i] + " [" + newindices[i] + "] ");
-		//	System.out.println();
+			System.out.println(normals[i]);
+
+			//	System.out.println();
 		}
 
 		// short[] indices
@@ -421,20 +419,78 @@ public class MarchingCubes{
 		*/
 
 	}
-	
+
 	float[] addNormals(float[] vertices, short[] indices){
 		float[] normals = new float[2 * vertices.length];
 		
-		Vector3 v1 = new Vector3();
-		Vector3 v2 = new Vector3();
-		Vector3 v3 = new Vector3();
+		//temporary vector
+		Vector3 v = new Vector3();
 		
-		for(int i = 0; i < vertices.length/3-3; i ++){
-			int off = i*3;
+		//add normals
+		for(int i = 0;i < indices.length / 3;i ++){
+			int a = indices[i * 3 + 0] * 3;
+			int b = indices[i * 3 + 1] * 3;
+			int c = indices[i * 3 + 2] * 3;
+
+			float x1 = vertices[a + 0];
+			float y1 = vertices[a + 1];
+			float z1 = vertices[a + 2];
+
+			float x2 = vertices[b + 0];
+			float y2 = vertices[b + 1];
+			float z2 = vertices[b + 2];
+
+			float x3 = vertices[c + 0];
+			float y3 = vertices[c + 1];
+			float z3 = vertices[c + 2];
 			
-			int a = i*3;
-			int b = (i+1)*3;
-			int c = (i+2)*3;
+			//v.set(x1, y1, z1);
+			v.set(x3 - x1, y3 - y1, z3 - z1).crs(x2 - x1, y2 - y1, z2 - z1).scl(-1).nor();
+
+			normals[a*2 + 0 + 3] += v.x;
+			normals[a*2 + 1 + 3] += v.y;
+			normals[a*2 + 2 + 3] += v.z;
+
+			normals[b*2 + 0 + 3] += v.x;
+			normals[b*2 + 1 + 3] += v.y;
+			normals[b*2 + 2 + 3] += v.z;
+
+			normals[c*2 + 0 + 3] += v.x;
+			normals[c*2 + 1 + 3] += v.y;
+			normals[c*2 + 2 + 3] += v.z;
+			
+		//	if(i < 3)
+		//		System.out.printf("a: %d, b: %d, c: %d -[]- x1: %f, y1: %f, z1: %f -[]- x2: %f, y2: %f, z2: %f -[]- x3: %f, y3: %f, z3: %f\n", a, b, c, x1, y1, z1, x2, y2, z2, x3, y3, z3);
+		}
+		
+		//normalize final normals
+		for(int i = 0;i < normals.length / 6;i ++){
+			int o = i*6;
+			
+			float nx = normals[o + 0 + 3];
+			float ny = normals[o + 1 + 3];
+			float nz = normals[o + 2 + 3];
+			
+			
+			v.set(nx, ny, nz).nor();
+		//	System.out.println(v);
+			
+			normals[o + 0 + 3] = v.x;
+			normals[o + 1 + 3] = v.y;
+			normals[o + 2 + 3] = v.z;
+		}
+
+		/*
+		for(int i = 0; i < vertices.length/9-1; i ++){
+			int vindex = i*3;
+			
+			int a = indices[vindex]*3;
+			int b = indices[vindex+1]*3;
+			int c = indices[vindex+2]*3;
+			
+			if(i < 6){
+				System.out.printf("a: %d, b: %d, c: %d\n", a, b, c);
+			}
 			
 			float x1 = vertices[a+0];
 			float y1 = vertices[a+1];
@@ -448,49 +504,47 @@ public class MarchingCubes{
 			float y3 = vertices[c+1];
 			float z3 = vertices[c+2];
 			
-			/*
-			float dx1 = x2 - x1;
-			float dx2 = x3 - x1;
-			float dy1 = y2 - y1;
-			float dy2 = y3 - y1;
-			float dz1 = z2 - z1;
-			float dz2 = z3 - z1;
-			*/
 			v1.set(x3 - x1, y3 - y1, z3 - z1).crs(x2 - x1, y2 - y1, z2 - z1).nor();
-			/*
-			int noff = i*6;
-			normals[noff+3] = v1.x;
-			normals[noff+4] = v1.y;
-			normals[noff+5] = v1.z;
 			
-			normals[noff+3+3] = v1.x;
-			normals[noff+4+3] = v1.y;
-			normals[noff+5+3] = v1.z;
 			
-			normals[noff+3+6] = v1.x;
-			normals[noff+4+6] = v1.y;
-			normals[noff+5+6] = v1.z;
-			*/
+			int noff = i*3*2;
+			if(i < 6)
+			System.out.println("noff: " + noff);
+			
+			normals[a*2+3] += v1.x;
+			normals[a*2+4] += v1.y;
+			normals[a*2+5] += v1.z;
+			
+			normals[b*2+3] += v1.x;
+			normals[b*2+4] += v1.y;
+			normals[b*2+5] += v1.z;
+			
+			normals[c*2+3] += v1.x;
+			normals[c*2+4] += v1.y;
+			normals[c*2+5] += v1.z;
+			
 		}
+		*/
 		
-		for(int i = 0; i < (vertices.length)*2; i ++){
-			if(i%6<3){
-				normals[i] = vertices[i%3 + (i/6)*3];
+		//add vertices
+		for(int i = 0;i < (vertices.length) * 2;i ++){
+			if(i % 6 < 3){
+				normals[i] = vertices[i % 3 + (i / 6) * 3];
 			}
 		}
-		
+
 		return normals;
 	}
 
 	float[] createNormals(float[] vertices, short[] indices){
-		int nVertices = vertices.length, nTriangles = nVertices/3;
-		
+		int nVertices = vertices.length, nTriangles = nVertices / 3;
+
 		float[] normals = new float[3 * nVertices];
 		for(int i = 0;i < 3 * nVertices;i ++)
 			normals[i] = 0.0f;
 
 		int numnans = 0;
-		
+
 		Vector3 v1 = new Vector3();
 		Vector3 v2 = new Vector3();
 
@@ -515,7 +569,7 @@ public class MarchingCubes{
 			float dy2 = y3 - y1;
 			float dz1 = z2 - z1;
 			float dz2 = z3 - z1;
-			
+
 			Vector3 normal = v1.set(dx1, dy1, dz1).crs(dx2, dy2, dz2).nor();
 
 			float len = normal.dot(normal);
@@ -541,7 +595,6 @@ public class MarchingCubes{
 
 		// normalize final normal
 
-		
 		return normals;
 	}
 
@@ -633,7 +686,7 @@ public class MarchingCubes{
 					vertices.add(new_z);
 					return key_out;
 				}else{ // Not empty leaf. Need to split
-					// Check if position corresponding to this key is sufficiently close to the current key's positoin
+					   // Check if position corresponding to this key is sufficiently close to the current key's positoin
 
 					float old_x = vertices.get(3 * key + 0);
 					float old_y = vertices.get(3 * key + 1);

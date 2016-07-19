@@ -43,6 +43,7 @@ public class Renderer extends Module<Fluxe>{
 		environment = new Environment();
 		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
 		environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
+		
 		//environment.add(shadowLight.set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
 
 		//environment.shadowMap = shadowLight;
@@ -106,7 +107,7 @@ public class Renderer extends Module<Fluxe>{
 
 		
 		camController.update();
-		
+		/*
 		
 		shadowLight.begin(Vector3.Zero, cam.direction);
 		shadowBatch.begin(shadowLight.getCamera());
@@ -115,7 +116,7 @@ public class Renderer extends Module<Fluxe>{
 
 		shadowBatch.end();
 		shadowLight.end();
-		
+		*/
 
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth() / pixelscale, Gdx.graphics.getHeight() / pixelscale);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);

@@ -1,8 +1,11 @@
 package net.pixelstatic.fluxe.meshes;
 
+import net.pixelstatic.utils.MiscUtils;
+
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.FloatArray;
+import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.ShortArray;
 
 public class MarchingCubes{
@@ -299,8 +302,11 @@ public class MarchingCubes{
 	}
 
 	int width = 50, height = 50, depth = 50;
+	int[][][] grid;
 
 	public void march(Mesh mesh, int[][][] grid){
+		this.grid = grid;
+		
 		width = grid.length;
 		height = grid[0].length;
 		depth = grid[0][0].length;
@@ -367,12 +373,9 @@ public class MarchingCubes{
 		}
 
 		printf("Done marching cubes\n");
-
-		printf("Mesh stats:\n");
-		printf("  %dx%dx%d = %d voxels\n", width, height, depth, depth * height * depth);
-		printf("  %d vertices\n", (int)vertices.size);
-		printf("  %d triangles\n", (int)indices.size / 3);
-
+		
+	//	fixTriangles(vertices, indices);
+		
 		short[] newindices = indices.toArray();
 
 		float[] normals = addNormals(vertices.toArray(), newindices);//createNormals(vertices.toArray(), newindices);
@@ -382,10 +385,15 @@ public class MarchingCubes{
 
 		for(int i = 0;i < normals.length;i ++){
 			//newindices[i]*=2;
-			System.out.println(normals[i]);
+		//	System.out.println(normals[i]);
 
 			//	System.out.println();
 		}
+		
+		printf("Mesh stats:\n");
+		printf("  %dx%dx%d = %d voxels\n", width, height, depth, depth * height * depth);
+		printf("  %d vertices\n", (int)vertices.size);
+		printf("  %d triangles\n", (int)indices.size / 3);
 
 		// short[] indices
 
@@ -532,71 +540,51 @@ public class MarchingCubes{
 				normals[i] = vertices[i % 3 + (i / 6) * 3];
 			}
 		}
+		
+		normals = addColors(normals);
 
 		return normals;
 	}
-
-	float[] createNormals(float[] vertices, short[] indices){
-		int nVertices = vertices.length, nTriangles = nVertices / 3;
-
-		float[] normals = new float[3 * nVertices];
-		for(int i = 0;i < 3 * nVertices;i ++)
-			normals[i] = 0.0f;
-
-		int numnans = 0;
-
-		Vector3 v1 = new Vector3();
-		Vector3 v2 = new Vector3();
-
-		// add (normalized) normals from adjacent triangles to each vertex
-		for(int i = 0;i < nTriangles;i ++){
-			int id1 = indices[3 * i + 0];
-			int id2 = indices[3 * i + 1];
-			int id3 = indices[3 * i + 2];
-			float x1 = vertices[3 * id1 + 0];
-			float y1 = vertices[3 * id1 + 1];
-			float z1 = vertices[3 * id1 + 2];
-			float x2 = vertices[3 * id2 + 0];
-			float y2 = vertices[3 * id2 + 1];
-			float z2 = vertices[3 * id2 + 2];
-			float x3 = vertices[3 * id3 + 0];
-			float y3 = vertices[3 * id3 + 1];
-			float z3 = vertices[3 * id3 + 2];
-
-			float dx1 = x2 - x1;
-			float dx2 = x3 - x1;
-			float dy1 = y2 - y1;
-			float dy2 = y3 - y1;
-			float dz1 = z2 - z1;
-			float dz2 = z3 - z1;
-
-			Vector3 normal = v1.set(dx1, dy1, dz1).crs(dx2, dy2, dz2).nor();
-
-			float len = normal.dot(normal);
-			if((len) == Float.NaN)
-				numnans ++;
-			// printf("%d %d %d, (%f %f %f) (%f %f %f) (%f %f %f)\n", id1, id2, id3, x1,y1,z1, x2, y2, z2, x3, y3, z3); fflush(stdout);
-			else{
-				normals[3 * id1 + 0] += normal.x;
-				normals[3 * id1 + 1] += normal.y;
-				normals[3 * id1 + 2] += normal.z;
-
-				normals[3 * id2 + 0] += normal.x;
-				normals[3 * id2 + 1] += normal.y;
-				normals[3 * id2 + 2] += normal.z;
-
-				normals[3 * id3 + 0] += normal.x;
-				normals[3 * id3 + 1] += normal.y;
-				normals[3 * id3 + 2] += normal.z;
-			}
-
+	
+	float[] addColors(float[] vertices){
+		float[] colors = new float[(int)(vertices.length * (7f/6f)+1)];
+		//System.out.println(colors.length + " old: " + vertices.length);
+		for(int i = 0;i < vertices.length / 6;i ++){
+			int ov = i*6;
+			int oc = i*7;
+			
+			float x = vertices[ov+0],y = vertices[ov+1],z = vertices[ov+2];
+			
+			colors[oc+0] = x;
+			colors[oc+1] = y;
+			colors[oc+2] = z;
+			
+		//	System.out.printf("color at %d, %d, %d: %d\n", (int)x, (int)y, (int)z, grid[(int)x][(int)y][(int)z]);
+			
+			colors[oc+3] = NumberUtils.intToFloatColor(getColor(x,y,z));
+			
+			colors[oc+4] = vertices[ov+3];
+			colors[oc+5] = vertices[ov+4];
+			colors[oc+6] = vertices[ov+5];
 		}
-		printf("num NaNs = %d\n", numnans);
-
-		// normalize final normal
-
-		return normals;
+		
+		return colors;
 	}
+	
+	int getColor(float x, float y, float z){
+		float r = 2f;
+		for(float mx = -r; mx < r; mx ++){
+			for(float my = -r; my < r; my ++){
+				for(float mz = -r; mz < r; mz ++){
+					if(!MiscUtils.inBounds((int)(x+mx),(int)(y+my),(int)(z+mz), grid)) continue;
+					int i = grid[(int)(x+mx)][(int)(y+my)][(int)(z+mz)];
+					if(i != 0) return i;
+				}
+			}
+		}
+		return 0;
+	}
+
 
 	class OctreeNode{
 		OctreeNode nwu, neu, swu, seu;

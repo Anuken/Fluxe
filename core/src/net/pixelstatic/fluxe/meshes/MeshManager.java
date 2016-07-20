@@ -98,7 +98,7 @@ public class MeshManager{
 	public void smoothMesh(Mesh mesh){
 		float[] vertices = new float[mesh.getVerticesBuffer().capacity()];
 		
-		//        0123    4     567
+		//        012     3       456
 		//format: XYZ - color - normalXYZ
 		
 		mesh.getVertices(vertices);
@@ -163,7 +163,7 @@ public class MeshManager{
 	private void checkMesh(){
 		if(meshBuilder.getAttributes() == null){
 
-			meshBuilder.begin(Usage.Position | Usage.Normal /* Usage.ColorPacked*/, GL20.GL_TRIANGLES);
+			meshBuilder.begin(Usage.Position | Usage.Normal | Usage.ColorPacked, GL20.GL_TRIANGLES);
 			//System.out.println("Beginning first mesh build");
 
 		}else if(meshBuilder.getNumIndices() >= Short.MAX_VALUE + 16000 /*if the vertices will exceed max vertices soon*/){
@@ -171,7 +171,7 @@ public class MeshManager{
 
 			//System.out.println("Adding new mesh.");
 
-			meshBuilder.begin(Usage.Position | Usage.Normal /* Usage.ColorPacked*/, GL20.GL_TRIANGLES);
+			meshBuilder.begin(Usage.Position | Usage.Normal | Usage.ColorPacked, GL20.GL_TRIANGLES);
 		}
 	}
 

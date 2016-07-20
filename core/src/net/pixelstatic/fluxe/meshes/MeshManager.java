@@ -21,6 +21,7 @@ public class MeshManager{
 	private final Vector3[] vectors = new Vector3[8];
 	private final MeshBuilder meshBuilder = new MeshBuilder();
 	private final ModelBuilder modelBuilder = new ModelBuilder();
+	private final MarchingCubes cubes = new MarchingCubes();
 
 	private Array<Mesh> meshes;
 
@@ -82,33 +83,18 @@ public class MeshManager{
 	}
 
 	public Model generateVoxelModel(int[][][] voxels){
-		Mesh[] meshes = generateVoxelMesh(voxels, 0, 0, 0, 1);
 		
-		new MarchingCubes().march(meshes[0], voxels);
+		
+		Mesh[] meshes = cubes.createVoxelMesh(voxels);
 		
 		modelBuilder.begin();
 		int i = 0;
+		
 		for(Mesh mesh : meshes){
-		//	smoothMesh(mesh);
 			modelBuilder.part("mesh" + i ++, mesh, GL20.GL_TRIANGLES, new Material());
 		}
+
 		return modelBuilder.end();
-	}
-	
-	public void smoothMesh(Mesh mesh){
-		float[] vertices = new float[mesh.getVerticesBuffer().capacity()];
-		
-		//        012     3       456
-		//format: XYZ - color - normalXYZ
-		
-		mesh.getVertices(vertices);
-		
-		for(int i = 0; i < 9; i ++){
-			System.out.println(vertices[i]);
-		}
-		
-		System.out.println("\n\n");
-		mesh.setVertices(vertices);
 	}
 
 	public EnumSet<Direction> getFlags(int[][][] voxels, int x, int y, int z){

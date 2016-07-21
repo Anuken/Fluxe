@@ -3,6 +3,7 @@ package net.pixelstatic.fluxe.meshes;
 import net.pixelstatic.utils.MiscUtils;
 
 import com.badlogic.gdx.graphics.Mesh;
+import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
 import com.badlogic.gdx.math.Vector3;
@@ -11,16 +12,18 @@ import com.badlogic.gdx.utils.*;
 public class MarchingCubes{
 	int width = 50, height = 50, depth = 50;
 	int[][][] grid;
-	
+	boolean splitTriangles = true;
+
+	/*
 	public Mesh[] createVoxelMesh(int[][][] grid){
 		this.grid = grid;
 		Array<Mesh> meshes = new Array<Mesh>();
-		
+
 		width = grid.length;
 		height = grid[0].length;
 		depth = grid[0][0].length;
-		
-		
+
+		/*
 		Result result = march(0,0,0);
 		if(!result.done()){
 			throw new GdxRuntimeException("Too many vertices.");
@@ -28,25 +31,26 @@ public class MarchingCubes{
 		
 		meshes.add(result.mesh);
 		
-		/*
+
 		int offsetx = 0, offsety = 0, offsetz = 0;
 		Result result = null;
-		
+
 		while(true){
-			System.out.println("Mesges: " + meshes.size);
+
 			result = march(offsetx, offsety, offsetz);
-			
+
 			meshes.add(result.mesh);
 			if(result.done()){
 				break;
 			}
-			
+
 			offsetx = result.offsetx;
 			offsety = result.offsety;
 			offsetz = result.offsetz;
-			
+
 		}
-		*/
+		//meshes.removeIndex(0);
+		System.out.println("\n\nTotal Meshes: " + meshes.size);
 		/*
 		for(result = march(offsetx, offsety, offsetz); !result.done();){
 			System.out.println("Iterating: " + meshes.size);
@@ -56,40 +60,32 @@ public class MarchingCubes{
 			offsetz = result.offsetz;
 			System.out.printf("offsetx: %d, offsety: %d, offsetz: %d", offsetx, offsety, offsetz);
 		}
-		*/
-		//meshes.add(result.mesh);
 		
+		//meshes.add(result.mesh);
+
 		return meshes.toArray(Mesh.class);
 	}
+	*/
 
-	private Result march(int offsetx, int offsety, int offsetz){
+	public Mesh[] createVoxelMesh(int[][][] grid){
+		this.grid = grid;
+		width = grid.length;
+		height = grid[0].length;
+		depth = grid[0][0].length;
+
+		long timeStart = TimeUtils.millis();
+
 		FloatArray vertices = new FloatArray();
-		ShortArray indices = new ShortArray();
+		IntArray indices = new IntArray();
 
 		OctreeNode octtree = new OctreeNode(0, null, 0.0, 0.0, 0.0, width, height, depth);
 
-		printf("March cubes\n");
-		
-		boolean finished = false;
+		print("Marching cubes.");
 
-		for(int k = offsetz;k < depth - 1;k ++){
-			
-			if(finished) break;
-			
-			for(int j = offsety;j < height - 1;j ++){
-				
-				if(finished) break;
-				
-				for(int i = offsetx;i < width - 1;i ++){
-					
-					if(vertices.size / 3 + 3 >= Short.MAX_VALUE){
-						finished = true;
-						offsetx = i;
-						offsety = j;
-						offsetz = k;
-						break;
-					}
-					
+		for(int k = 0;k < depth - 1;k ++){
+			for(int j = 0;j < height - 1;j ++){
+				for(int i = 0;i < width - 1;i ++){
+
 					vec3[] vertlist = new vec3[12];
 
 					float isolevel = 0.5f;
@@ -128,55 +124,110 @@ public class MarchingCubes{
 						int key_out2 = octtree.insert(vertlist[triTable[cubeindex][id + 1]].x, vertlist[triTable[cubeindex][id + 1]].y, vertlist[triTable[cubeindex][id + 1]].z, 0, vertices);
 						int key_out3 = octtree.insert(vertlist[triTable[cubeindex][id + 2]].x, vertlist[triTable[cubeindex][id + 2]].y, vertlist[triTable[cubeindex][id + 2]].z, 0, vertices);
 
-						indices.add((short)key_out1);
-						indices.add((short)key_out2);
-						indices.add((short)key_out3);
+						indices.add(key_out1);
+						indices.add(key_out2);
+						indices.add(key_out3);
 
 					}
 				}
 			}
 		}
 
-		short[] newindices = indices.toArray();
+		if(splitTriangles) fixTriangles(vertices, indices);
+
+		int[] newindices = indices.toArray();
 
 		float[] newvertices = addNormals(vertices.toArray(), newindices);//createNormals(vertices.toArray(), newindices);
 
-		Mesh mesh = new Mesh(true, newvertices.length, newindices.length, MeshBuilder.createAttributes(Usage.Position | Usage.Normal | Usage.ColorPacked));
+		Array<Mesh> meshes = new Array<Mesh>();
 
-		mesh.setVertices(newvertices);
-		mesh.setIndices(newindices);
+		splitMeshes(meshes, newvertices, newindices);
+
+		//Mesh mesh = new Mesh(true, newvertices.length, newindices.length, MeshBuilder.createAttributes(Usage.Position | Usage.Normal | Usage.ColorPacked));
+
+		//mesh.setVertices(newvertices);
+		//mesh.setIndices(newindices);
 
 		printf("Mesh stats:\n");
-		printf("  %dx%dx%d = %d voxels\n", width, height, depth, depth * height * depth);
 		printf("  %d vertices\n", (int)vertices.size);
 		printf("  %d triangles\n", (int)indices.size / 3);
-		
-		if(!finished){
-			offsetx = width - 2;
-			offsety = height - 2;
-			offsetz = depth - 2;
-		}
+		print("Number of meshes: " + meshes.size);
 
-		return new Result(mesh, offsetx, offsety, offsetz);
-	}
-	
-	class Result{
-		Mesh mesh;
-		int offsetx, offsety, offsetz;
-		
-		public Result(Mesh mesh, int offsetx, int offsety, int offsetz){
-			this.mesh = mesh;
-			this.offsetx = offsetx;
-			this.offsety = offsety;
-			this.offsetz = offsetz;
-		}
-		
-		public boolean done(){
-			return offsetx == width - 2 && offsety == height - 2 && offsetz == depth - 2;
-		}
+		print("Time to generate: " + TimeUtils.timeSinceMillis(timeStart) + "ms");
+
+		return meshes.toArray(Mesh.class);
 	}
 
-	float[] addNormals(float[] vertices, short[] indices){
+	/*
+		class Result{
+			Mesh mesh;
+			int offsetx, offsety, offsetz;
+
+			public Result(Mesh mesh, int offsetx, int offsety, int offsetz){
+				this.mesh = mesh;
+				this.offsetx = offsetx;
+				this.offsety = offsety;
+				this.offsetz = offsetz;
+			}
+
+			public boolean done(){
+				return offsetx == width - 2 && offsety == height - 2 && offsetz == depth - 2;
+			}
+		}
+	*/
+	void splitMeshes(Array<Mesh> meshes, float[] vertices, int[] indices){
+		VertexAttributes attributes = MeshBuilder.createAttributes(Usage.Position | Usage.Normal | Usage.ColorPacked);
+
+		//int max = Short.MAX_VALUE - 3;
+		int maxVertices = (int)((int)(((Short.MAX_VALUE * (splitTriangles ? 1 : 3)) - 3)/3f)/7f)*7*7*3;
+
+		int meshAmount = vertices.length / maxVertices + 1;
+
+		System.out.println(meshAmount);
+
+		for(int num = 0;num < meshAmount;num ++){
+			FloatArray currentvertices = new FloatArray();
+			ShortArray currentindices = new ShortArray();
+			
+			for(int i = num*maxVertices; i < num*maxVertices + maxVertices && i < vertices.length;i ++){
+				currentvertices.add(vertices[i]);
+				
+				if(i % 7 == 0) currentindices.add(indices[i / 7]- (num*maxVertices/7));
+			}
+			
+			Mesh mesh = new Mesh(true, currentvertices.size, currentindices.size, attributes);
+			mesh.setVertices(currentvertices.toArray());
+			mesh.setIndices(currentindices.toArray());
+			meshes.add(mesh);
+		}
+
+		//for(int i = 0){
+
+		//}
+	}
+
+	void fixTriangles(FloatArray vertices, IntArray indices){
+		float[] verticearray = vertices.toArray();
+		int[] indicearray = indices.toArray();
+
+		vertices.clear();
+		indices.clear();
+
+		for(int i = 0;i < indicearray.length;i ++){
+			int o = indicearray[i] * 3;
+			float x = verticearray[o + 0];
+			float y = verticearray[o + 1];
+			float z = verticearray[o + 2];
+
+			vertices.add(x);
+			vertices.add(y);
+			vertices.add(z);
+
+			indices.add(i);
+		}
+	}
+
+	float[] addNormals(float[] vertices, int[] indices){
 		float[] normals = new float[2 * vertices.length];
 
 		//temporary vector
@@ -295,24 +346,46 @@ public class MarchingCubes{
 
 	float[] addColors(float[] vertices){
 		float[] colors = new float[(int)(vertices.length * (7f / 6f) + 1)];
-		//System.out.println(colors.length + " old: " + vertices.length);
-		for(int i = 0;i < vertices.length / 6;i ++){
-			int ov = i * 6;
-			int oc = i * 7;
 
-			float x = vertices[ov + 0], y = vertices[ov + 1], z = vertices[ov + 2];
+		if( !splitTriangles){
+			//do per vertex colors
+			for(int i = 0;i < vertices.length / 6;i ++){
+				int ov = i * 6;
+				int oc = i * 7;
 
-			colors[oc + 0] = x;
-			colors[oc + 1] = y;
-			colors[oc + 2] = z;
+				float x = vertices[ov + 0], y = vertices[ov + 1], z = vertices[ov + 2];
 
-			//	System.out.printf("color at %d, %d, %d: %d\n", (int)x, (int)y, (int)z, grid[(int)x][(int)y][(int)z]);
+				colors[oc + 0] = x;
+				colors[oc + 1] = y;
+				colors[oc + 2] = z;
 
-			colors[oc + 3] = NumberUtils.intToFloatColor(getColor(x, y, z));
+				colors[oc + 3] = NumberUtils.intToFloatColor(getColor(x, y, z));
 
-			colors[oc + 4] = vertices[ov + 3];
-			colors[oc + 5] = vertices[ov + 4];
-			colors[oc + 6] = vertices[ov + 5];
+				colors[oc + 4] = vertices[ov + 3];
+				colors[oc + 5] = vertices[ov + 4];
+				colors[oc + 6] = vertices[ov + 5];
+			}
+
+		}else{
+			//do colors per tri
+			for(int i = 0;i < vertices.length / 6;i ++){
+				int ov = i * 6;
+				int oc = i * 7;
+
+				float x = vertices[ov + 0], y = vertices[ov + 1], z = vertices[ov + 2];
+
+				float rx = vertices[(ov / 18) * 18 + 0], ry = vertices[(ov / 18) * 18 + 1], rz = vertices[(ov / 18) * 18 + 2];
+
+				colors[oc + 0] = x;
+				colors[oc + 1] = y;
+				colors[oc + 2] = z;
+
+				colors[oc + 3] = NumberUtils.intToFloatColor(getColor(rx, ry, rz));
+
+				colors[oc + 4] = vertices[ov + 3];
+				colors[oc + 5] = vertices[ov + 4];
+				colors[oc + 6] = vertices[ov + 5];
+			}
 		}
 
 		return colors;
@@ -776,5 +849,9 @@ public class MarchingCubes{
 
 	void printf(String string, Object...args){
 		System.out.printf(string, args);
+	}
+
+	void print(String string){
+		System.out.println(string);
 	}
 }

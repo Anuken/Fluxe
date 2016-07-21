@@ -3,6 +3,7 @@ package net.pixelstatic.fluxe.modules;
 import java.nio.ByteBuffer;
 
 import net.pixelstatic.fluxe.Fluxe;
+import net.pixelstatic.fluxe.generation.TreeGenerator;
 import net.pixelstatic.fluxe.meshes.MeshManager;
 import net.pixelstatic.utils.graphics.FrameBufferMap;
 import net.pixelstatic.utils.graphics.PixmapUtils;
@@ -21,8 +22,6 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight;
 import com.badlogic.gdx.graphics.g3d.shaders.DepthShader;
 import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 
@@ -36,12 +35,13 @@ public class Renderer extends Module<Fluxe>{
 	public FrameBufferMap buffers = new FrameBufferMap();
 	public final MeshManager meshes = new MeshManager();
 	public DirectionalShadowLight shadowLight;
-	public int pixelscale = 1;
-	public int size = 60;
+	public int pixelscale = 10;
+	public int size = 90;
 	public boolean pixelate = false;
 	public Array<Model> models = new Array<Model>();
 	public Array<ModelInstance> modelInstances = new Array<ModelInstance>();
-	int[][][] voxels = new int[size][size][size];
+	public TreeGenerator generator = new TreeGenerator();
+	int[][][] voxels;
 
 	public Renderer(){
 
@@ -75,7 +75,10 @@ public class Renderer extends Module<Fluxe>{
 		cam.update();
 
 		camController = new FirstPersonCameraController(cam);
-
+		
+		voxels = generator.generate(size);
+		
+		/*
 		for(int x = 0;x < voxels.length;x ++){
 			for(int y = 0;y < voxels[x].length;y ++){
 				for(int z = 0;z < voxels[x][y].length;z ++){
@@ -93,7 +96,7 @@ public class Renderer extends Module<Fluxe>{
 				}
 			}
 		}
-
+*/
 		Model model = meshes.generateVoxelModel(voxels);
 
 		add(model);

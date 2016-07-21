@@ -64,7 +64,7 @@ public class MeshManager{
 		for(int x = 0;x < voxels.length;x ++){
 			for(int y = 0;y < voxels[x].length;y ++){
 				for(int z = 0;z < voxels[x][y].length;z ++){
-					EnumSet<Direction> flags = getFlags(voxels, x, y, z);
+					//EnumSet<Direction> flags = getFlags(voxels, x, y, z);
 
 					color.set(voxels[x][y][z]);
 

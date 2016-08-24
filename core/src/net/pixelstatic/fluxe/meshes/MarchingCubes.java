@@ -12,7 +12,7 @@ import com.badlogic.gdx.utils.*;
 public class MarchingCubes{
 	int width = 50, height = 50, depth = 50;
 	int[][][] grid;
-	boolean splitTriangles = true;
+	boolean splitTriangles = false;
 
 	/*
 	public Mesh[] createVoxelMesh(int[][][] grid){
@@ -177,11 +177,32 @@ public class MarchingCubes{
 	*/
 	void splitMeshes(Array<Mesh> meshes, float[] vertices, int[] indices){
 		VertexAttributes attributes = MeshBuilder.createAttributes(Usage.Position | Usage.Normal | Usage.ColorPacked);
-
+		
+		while(true){
+			FloatArray currentvertices = new FloatArray();
+			ShortArray currentindices = new ShortArray();
+			for(int i = 0; i < vertices.length; i ++){
+				currentvertices.add(vertices[i]);
+			}
+			for(int i = 0; i < indices.length; i ++){
+				currentindices.add(indices[i]);
+			}
+			Mesh mesh = new Mesh(true, currentvertices.size, currentindices.size, attributes);
+			mesh.setVertices(currentvertices.toArray());
+			mesh.setIndices(currentindices.toArray());
+			meshes.add(mesh);
+			break;
+		}
+		
+		
+		
+		/*
 		//int max = Short.MAX_VALUE - 3;
 		int maxVertices = (int)((int)(((Short.MAX_VALUE * (splitTriangles ? 1 : 3)) - 3)/3f)/7f)*7*7*3;
 
 		int meshAmount = vertices.length / maxVertices + 1;
+		
+		int maxIndices = 0;
 
 		System.out.println(meshAmount);
 
@@ -191,8 +212,12 @@ public class MarchingCubes{
 			
 			for(int i = num*maxVertices; i < num*maxVertices + maxVertices && i < vertices.length;i ++){
 				currentvertices.add(vertices[i]);
-				
-				if(i % 7 == 0) currentindices.add(indices[i / 7]- (num*maxVertices/7));
+				//System.out.println(indices.length);
+				//if(i % 7 == 0) currentindices.add(indices[i / 7]- (num*maxVertices/7));
+			}
+			
+			for(int i = num*maxIndices; i < num*maxIndices + maxIndices && i < indices.length;i ++){
+				currentindices.add(indices[i]- (num*maxIndices));
 			}
 			
 			Mesh mesh = new Mesh(true, currentvertices.size, currentindices.size, attributes);
@@ -204,6 +229,10 @@ public class MarchingCubes{
 		//for(int i = 0){
 
 		//}
+		 * 
+		 */
+		
+		
 	}
 
 	void fixTriangles(FloatArray vertices, IntArray indices){

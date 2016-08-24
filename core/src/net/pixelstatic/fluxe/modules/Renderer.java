@@ -5,8 +5,8 @@ import java.nio.ByteBuffer;
 import net.pixelstatic.fluxe.Fluxe;
 import net.pixelstatic.fluxe.generation.TreeGenerator;
 import net.pixelstatic.fluxe.meshes.MeshManager;
-import net.pixelstatic.utils.graphics.FrameBufferMap;
-import net.pixelstatic.utils.graphics.PixmapUtils;
+import net.pixelstatic.gdxutils.graphics.FrameBufferMap;
+import net.pixelstatic.gdxutils.graphics.PixmapUtils;
 import net.pixelstatic.utils.modules.Module;
 
 import com.badlogic.gdx.Gdx;
@@ -36,7 +36,7 @@ public class Renderer extends Module<Fluxe>{
 	public final MeshManager meshes = new MeshManager();
 	public DirectionalShadowLight shadowLight;
 	public int pixelscale = 10;
-	public int size = 90;
+	public int size = 50;
 	public boolean pixelate = false;
 	public Array<Model> models = new Array<Model>();
 	public Array<ModelInstance> modelInstances = new Array<ModelInstance>();
@@ -117,6 +117,21 @@ public class Renderer extends Module<Fluxe>{
 		if(Gdx.input.isKeyJustPressed(Keys.ESCAPE)){
 			Gdx.app.exit();
 		}
+		
+		if(Gdx.input.isKeyJustPressed(Keys.R)){
+			voxels = generator.generate(size);
+			
+			for(Model model : models) model.dispose();
+			models.clear();
+			modelInstances.clear();
+			
+			Model model = meshes.generateVoxelModel(voxels);
+
+			add(model);
+		}
+		
+		if(Gdx.input.isKeyJustPressed(Keys.E))
+			pixelate = !pixelate;
 
 		camController.update();
 		/*

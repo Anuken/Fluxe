@@ -185,7 +185,8 @@ public class Renderer extends Module<Fluxe>{
 		Color color = new Color();
 
 		Pixmap pixmap = PixmapUtils.copy(input);
-
+		
+		
 		for(int x = 0;x < input.getWidth();x ++){
 			for(int y = 0;y < input.getHeight();y ++){
 				int i = input.getPixel(x, y);
@@ -194,7 +195,7 @@ public class Renderer extends Module<Fluxe>{
 
 				color.set(i);
 
-				if(color.a < 0.001f){
+				if(color.a < 0.001f && false){
 					if( !empty(input.getPixel(x + 1, y)) || !empty(input.getPixel(x - 1, y)) || !empty(input.getPixel(x, y + 1)) || !empty(input.getPixel(x, y - 1))) color.set(1, 1, 1, 1);
 				}else{
 					color.r = round(color.r);

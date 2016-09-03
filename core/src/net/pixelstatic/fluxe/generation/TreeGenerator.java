@@ -19,23 +19,23 @@ public class TreeGenerator{
 
 		write = new int[size][size][size];
 		this.size = size;
-
+		
+		 voxels[size/2][1][size/2] = 2;
+		 //voxels[size/2+2][1][size/2+2] = 2;
+		// voxels[size/2-2][1][size/2+4] = 2;
+		
+/*
 		for(int x = 0;x < voxels.length;x ++){
 			for(int z = 0;z < voxels[x][1].length;z ++){
-				if(Vector2.dst(x, z, size / 2, size / 2) < 6) voxels[x][1][z] = 2;
+				if(Vector2.dst(x, z, size / 2, size / 2) < 1) voxels[x][1][z] = 2;
 			}
 		}
+		*/
 
 		while( !generated){
 			generate();
 
-			for(int x = 0;x < voxels.length;x ++){
-				for(int y = 0;y < voxels[x].length;y ++){
-					for(int z = 0;z < voxels[x][y].length;z ++){
-						voxels[x][y][z] = write[x][y][z];
-					}
-				}
-			}
+
 
 			if(generated) finish();
 
@@ -88,6 +88,20 @@ public class TreeGenerator{
 	}
 
 	void generate(){
+		int trunk = 9;
+		
+		for(int y = 1;y < trunk;y ++){
+			disc(size/2,y,size/2,4+(6-y)/3, bark);
+		}
+		
+		for(int y = trunk;y < voxels.length-5;y ++){
+			disc(size/2,y,size/2,(voxels.length-y)/5 - (y % 3)*2+3, leaves);
+		}
+		
+		
+		generated = true;
+		
+		/*
 		for(int x = 0;x < voxels.length;x ++){
 			for(int y = 0;y < voxels[x].length;y ++){
 				for(int z = 0;z < voxels[x][y].length;z ++){
@@ -100,15 +114,8 @@ public class TreeGenerator{
 							place(x, y + 1, z, 2);
 						}else{
 							int modx = 0, modz = 0, mody = 0;
-							int mx = x - size/2;
-							int mz = z - size/2;
-							if(Math.random() < 0.2)
-							if(Math.abs(mx) > Math.abs(mz)){
-								modx = modx < 0 ? -1 : 1;
-							}else{
-								modz = modz < 0 ? -1 : 1;
-							}
-							/*
+
+							
 							if(Math.random() < 0.66){
 								modx = MathUtils.randomSign();
 							}else if(Math.random() < 0.33){
@@ -116,7 +123,7 @@ public class TreeGenerator{
 							}else{
 								modz = MathUtils.randomSign();
 							}
-							*/
+							
 							place(x + modx, y + 1, z + modz, 2);
 						}
 
@@ -125,9 +132,28 @@ public class TreeGenerator{
 				}
 			}
 		}
+		*/
 	}
+	
 
 	void finish(){
+		/*
+		for(int x = 0;x < voxels.length;x ++){
+			for(int y = 0;y < voxels[x].length;y ++){
+				for(int z = 0;z < voxels[x][y].length;z ++){
+					if(voxels[x][y][z] != 0) disc(x,y,z,(size-y)/10+1);
+				}
+			}
+		}
+		
+		for(int x = 0;x < voxels.length;x ++){
+			for(int y = 0;y < voxels[x].length;y ++){
+				for(int z = 0;z < voxels[x][y].length;z ++){
+					voxels[x][y][z] = write[x][y][z];
+				}
+			}
+		}
+		
 		for(int x = 0;x < voxels.length;x ++){
 			for(int y = 0;y < voxels[x].length;y ++){
 				for(int z = 0;z < voxels[x][y].length;z ++){
@@ -135,10 +161,19 @@ public class TreeGenerator{
 				}
 			}
 		}
+		*/
+	}
+	
+	void disc(int px, int py, int pz, int rad, int type){
+		for(int x = 0;x < voxels.length;x ++){
+			for(int z = 0;z < voxels[x][py].length;z ++){
+				if(Vector2.dst(px, pz, x, z) < rad) place(x, py, z, type);
+			}
+		}
 	}
 
 	void place(int x, int y, int z, int color){
 		if( !MiscUtils.inBounds(x, y, z, voxels.length, 1)) return;
-		write[x][y][z] = color;
+		voxels[x][y][z] = color;
 	}
 }

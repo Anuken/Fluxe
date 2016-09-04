@@ -22,7 +22,9 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight;
 import com.badlogic.gdx.graphics.g3d.shaders.DepthShader;
 import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 @SuppressWarnings("deprecation")
@@ -42,9 +44,13 @@ public class Renderer extends Module<Fluxe>{
 	public Array<ModelInstance> modelInstances = new Array<ModelInstance>();
 	public TreeGenerator generator = new TreeGenerator();
 	int[][][] voxels;
-
+	ShaderProgram shader;
+	
 	public Renderer(){
-
+		ShaderProgram.pedantic = true;
+		shader = new ShaderProgram(Gdx.files.internal("shaders/default.vertex"), Gdx.files.internal("shaders/oilpaint.fragment"));
+		if (!shader.isCompiled()) throw new GdxRuntimeException("Couldn't compile shader: " + shader.getLog());
+		
 		shadowLight = new DirectionalShadowLight(1440 * 10, 900 * 10, 400f, 400f, 1f, 300f);
 
 		environment = new Environment();
@@ -65,7 +71,7 @@ public class Renderer extends Module<Fluxe>{
 		shadowBatch = new ModelBatch(provider);
 		batch = new SpriteBatch();
 
-		buffers.add("pixel", Gdx.graphics.getBackBufferWidth() / pixelscale, Gdx.graphics.getBackBufferHeight() / pixelscale);
+		//buffers.add("pixel", Gdx.graphics.getBackBufferWidth() / pixelscale, Gdx.graphics.getBackBufferHeight() / pixelscale);
 
 		cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		cam.position.set(size * 4, size * 2, size * 4);
@@ -146,15 +152,24 @@ public class Renderer extends Module<Fluxe>{
 		if(pixelate) Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth() / pixelscale, Gdx.graphics.getHeight() / pixelscale);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-		//buffers.begin("pixel");
+		buffers.begin("pixel");
 
-		//Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
 		modelBatch.begin(cam);
 
 		modelBatch.render(modelInstances, environment);
 
 		modelBatch.end();
+		
+		buffers.end("pixel");
+		
+		if(pixelate) Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth() / pixelscale, Gdx.graphics.getHeight() / pixelscale);
+		batch.setShader(shader);
+		batch.begin();
+		
+		batch.draw(buffers.texture("pixel"), 0, Gdx.graphics.getHeight(), Gdx.graphics.getWidth(), -Gdx.graphics.getHeight());
+		batch.end();
 
 		if(pixelate){
 			Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -162,6 +177,8 @@ public class Renderer extends Module<Fluxe>{
 			byte[] bytes = ScreenUtils.getFrameBufferPixels(0, 0, pixWidth(), pixHeight(), false);
 
 			Pixmap pixmap = new Pixmap(pixWidth(), pixHeight(), Format.RGBA8888);
+			
+			
 
 			ByteBuffer pixels = pixmap.getPixels();
 			pixels.clear();
@@ -171,7 +188,8 @@ public class Renderer extends Module<Fluxe>{
 			pixmap = process(pixmap);
 
 			Texture texture = new Texture(pixmap);
-
+			
+			batch.setShader(null);
 			batch.begin();
 			batch.draw(texture, 0, Gdx.graphics.getHeight(), Gdx.graphics.getWidth(), -Gdx.graphics.getHeight());
 			batch.end();
@@ -180,11 +198,19 @@ public class Renderer extends Module<Fluxe>{
 			pixmap.dispose();
 		}
 	}
+	
+	Color[] ramp = {hex("4e9449"), hex("3e723a"), hex("2e532b"), hex("254223"), hex("172916"),
+			hex("965f18"), hex("7c4f15"), hex("613e10"), hex("462d0c"), hex("38240b")};
+	
+	Color hex(String s){
+		return Color.valueOf(s);
+	}
 
 	Pixmap process(Pixmap input){
 		Color color = new Color();
 
 		Pixmap pixmap = PixmapUtils.copy(input);
+		
 		
 		
 		for(int x = 0;x < input.getWidth();x ++){
@@ -194,19 +220,54 @@ public class Renderer extends Module<Fluxe>{
 				//	if(alpha(i) == 0) continue;
 
 				color.set(i);
+				
+				if(color.a + color.r + color.g + color.b < 1.001f) continue;
 
-				if(color.a < 0.001f && false){
-					if( !empty(input.getPixel(x + 1, y)) || !empty(input.getPixel(x - 1, y)) || !empty(input.getPixel(x, y + 1)) || !empty(input.getPixel(x, y - 1))) color.set(1, 1, 1, 1);
-				}else{
-					color.r = round(color.r);
-					color.g = round(color.g);
-					color.b = round(color.b);
+				//if(color.a < 0.001f && false){
+				//	if( !empty(input.getPixel(x + 1, y)) || !empty(input.getPixel(x - 1, y)) || !empty(input.getPixel(x, y + 1)) || !empty(input.getPixel(x, y - 1))) color.set(1, 1, 1, 1);
+				//}else{
+					//color.r = round(color.r);
+					//color.g = round(color.g);
+					//color.b = round(color.b);
+				//}
+				
+				float md = 3f;
+				Color closest = null;
+				for(Color c : ramp){
+					float diff = Math.abs(c.r - color.r) + Math.abs(c.g - color.g)
+							+ Math.abs(c.b - color.b);
+					
+					if(diff < md){
+						closest = c;
+						md = diff;
+					}
 				}
+				
+				color.set(closest);
 
 				pixmap.setColor(color);
 				pixmap.drawPixel(x, y);
 			}
 		}
+		
+		for(int x = 0;x < input.getWidth();x ++){
+			for(int y = 0;y < input.getHeight();y ++){
+				input.drawPixel(x, y, pixmap.getPixel(x, y));
+			}
+		}
+		/*
+		//smooth colors
+		for(int x = 0;x < pixmap.getWidth();x ++){
+			for(int y = 0;y < pixmap.getHeight();y ++){
+				int c = input.getPixel(x, y);
+				
+				if(input.getPixel(x, y+1) != c && input.getPixel(x, y-1) != c && input.getPixel(x+1, y) != c && input.getPixel(x-1, y) != c){
+					pixmap.setColor(input.getPixel(x, y+1));
+					//pixmap.drawPixel(x,y);
+				}
+			}
+		}
+		*/
 		return pixmap;
 	}
 

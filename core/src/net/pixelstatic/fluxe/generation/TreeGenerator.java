@@ -1,5 +1,7 @@
 package net.pixelstatic.fluxe.generation;
 
+import java.util.Random;
+
 import net.pixelstatic.utils.MiscUtils;
 
 import com.badlogic.gdx.graphics.Color;
@@ -7,11 +9,12 @@ import com.badlogic.gdx.math.Vector2;
 
 public class TreeGenerator{
 	boolean generated = false;
-	int bark = Color.BROWN.toIntBits();
-	int leaves = Color.FOREST.toIntBits();
+	int bark = Color.valueOf("965f18").toIntBits();
+	int leaves = Color.valueOf("439432").toIntBits();
 	int[][][] write;
 	int[][][] voxels;
 	int size;
+	Random random = new Random();
 
 	public int[][][] generate(int size){
 		generated = false;
@@ -91,11 +94,15 @@ public class TreeGenerator{
 		int trunk = 9;
 		
 		for(int y = 1;y < trunk;y ++){
-			disc(size/2,y,size/2,4+(6-y)/3, bark);
+			ndisc(size/2,y,size/2,4+(6-y)/3, bark);
 		}
 		
-		for(int y = trunk;y < voxels.length-5;y ++){
+		for(int y = trunk;y < voxels.length-6;y ++){
 			disc(size/2,y,size/2,(voxels.length-y)/5 - (y % 3)*2+3, leaves);
+		}
+		
+		for(int y = 0; y < 4;y ++){
+			ndisc(size/2, voxels.length - y - 6,size/2, 1.2f, leaves);
 		}
 		
 		
@@ -165,8 +172,31 @@ public class TreeGenerator{
 	}
 	
 	void disc(int px, int py, int pz, int rad, int type){
+		int brad = rad;
+		Vector2 vector = new Vector2();
+		float off = random.nextFloat()*180;
 		for(int x = 0;x < voxels.length;x ++){
 			for(int z = 0;z < voxels[x][py].length;z ++){
+				vector.set(z - pz, x - px);
+				float angle = (vector.angle()+off)/10;
+				
+				rad = brad + (int)(Math.sin(angle)*1.2f);
+				
+				if(rad - brad > 0){
+					if(Vector2.dst(px, pz, x, z) < rad) place(x, py-1, z, type);
+				}else{
+					if(Vector2.dst(px, pz, x, z) < rad) place(x, py, z, type);
+				}
+				
+			}
+		}
+	}
+	
+	void ndisc(int px, int py, int pz, float rad, int type){
+		Vector2 vector = new Vector2();
+		for(int x = 0;x < voxels.length;x ++){
+			for(int z = 0;z < voxels[x][py].length;z ++){
+				vector.set(z - pz, x - px);
 				if(Vector2.dst(px, pz, x, z) < rad) place(x, py, z, type);
 			}
 		}

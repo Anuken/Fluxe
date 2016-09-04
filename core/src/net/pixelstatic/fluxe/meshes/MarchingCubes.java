@@ -424,9 +424,9 @@ public class MarchingCubes{
 		float r = 2f;
 		float sx = x < width/2 ? 1 : -1, sz = z < depth /2 ? 1 : -1;
 		
-		for(float mx =-r*sx; sx > 0 ? mx < r*sx : mx > r*sx; mx += sx){
-			for(float my = -r;my < r;my ++){
-				for(float mz = -r*sz; sz > 0 ? mz < r*sz : mz > r*sz; mz += sz){
+		for(float mx =-r*sx; sx*mx < r; mx += sx){
+			for(float my = -r; my < r;my ++){
+				for(float mz = -r*sz; sz*mz < r; mz += sz){
 					
 					if( !MiscUtils.inBounds((int)(x + mx), (int)(y + my), (int)(z + mz), grid)) continue;
 					int i = grid[(int)(x + mx)][(int)(y + my)][(int)(z + mz)];

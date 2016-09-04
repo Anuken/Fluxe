@@ -30,7 +30,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 @SuppressWarnings("deprecation")
 public class Renderer extends Module<Fluxe>{
 	public Environment environment;
-	public PerspectiveCamera cam;
+	public Camera cam;
 	public ModelBatch modelBatch, shadowBatch;
 	public SpriteBatch batch;
 	public FirstPersonCameraController camController;
@@ -73,15 +73,18 @@ public class Renderer extends Module<Fluxe>{
 		batch = new SpriteBatch();
 
 		//buffers.add("pixel", Gdx.graphics.getBackBufferWidth() / pixelscale, Gdx.graphics.getBackBufferHeight() / pixelscale);
-
+		
+		//cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+	
 		cam.position.set(size * 4, size * 2, size * 4);
 		cam.lookAt(size * 2, size * 2, size * 2);
+		//cam.
 		cam.near = 1f;
 		cam.far = 1000f;
 		cam.update();
 
-		camController = new FirstPersonCameraController(cam);
+		//camController = new FirstPersonCameraController(cam);
 
 		voxels = generator.generate(size);
 
@@ -130,6 +133,26 @@ public class Renderer extends Module<Fluxe>{
 		if(Gdx.input.isKeyJustPressed(Keys.Q)) shadows = !shadows;
 		
 		if(Gdx.input.isKeyJustPressed(Keys.T)) oil = !oil;
+		
+		if(Gdx.input.isKeyJustPressed(Keys.O)){
+			Camera old = cam;
+			if(cam instanceof OrthographicCamera){
+				cam.position.set(size * 4, size * 2, size * 4);
+
+				
+				
+				cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+			}else{
+				cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+				((OrthographicCamera)cam).zoom = 0.4f;
+			}
+			
+			cam.position.set(old.position);
+			cam.lookAt(size * 2, size * 2, size * 2);
+			cam.near = 1f;
+			cam.far = 1000f;
+			cam.update();
+		}
 
 		if(Gdx.input.isKeyJustPressed(Keys.R)){
 			voxels = generator.generate(size);
@@ -144,7 +167,7 @@ public class Renderer extends Module<Fluxe>{
 			add(model);
 		}
 
-		camController.update();
+		//camController.update();
 
 		if(shadows){
 			shadowLight.begin(Vector3.Zero, cam.direction);

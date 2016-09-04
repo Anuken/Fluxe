@@ -1,5 +1,7 @@
 package net.pixelstatic.fluxe.modules;
 
+import static java.lang.Math.abs;
+
 import java.nio.ByteBuffer;
 
 import net.pixelstatic.fluxe.Fluxe;
@@ -168,21 +170,20 @@ public class Renderer extends Module<Fluxe>{
 		}
 
 		//camController.update();
-
+		
+	
 		if(shadows){
 			shadowLight.begin(Vector3.Zero, cam.direction);
 			shadowBatch.begin(shadowLight.getCamera());
-
+			Gdx.gl.glClearColor(0,0,0,0);
 			shadowBatch.render(modelInstances, environment);
 
 			shadowBatch.end();
 			shadowLight.end();
 		}else{
 			shadowLight.begin(Vector3.Zero, cam.direction);
+			Gdx.gl.glClearColor(1,1,1,0);
 			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-
-			
-
 			shadowLight.end();
 		}
 
@@ -240,6 +241,13 @@ public class Renderer extends Module<Fluxe>{
 	Color hex(String s){
 		return Color.valueOf(s);
 	}
+	
+	
+	
+	Color leaves = Color.valueOf("965f18");
+	Color bark = Color.valueOf("439432");
+	
+	Color[] colors = {leaves, bark};
 
 	Pixmap process(Pixmap input){
 		Color color = new Color();
@@ -256,7 +264,7 @@ public class Renderer extends Module<Fluxe>{
 
 				color.set(i);
 
-				if(color.a + color.r + color.g + color.b < 1.001f || color.r + color.g + color.b >= 2.9f){
+				if(color.a + color.r + color.g + color.b < 1.001f || color.r + color.g + color.b >= 2.3f){
 
 					pixmap.drawPixel(x, y, blank);
 					continue;
@@ -269,7 +277,8 @@ public class Renderer extends Module<Fluxe>{
 				//color.g = round(color.g);
 				//color.b = round(color.b);
 				//}
-
+				
+				/*
 				float md = 3f;
 				Color closest = null;
 				for(Color c : ramp){
@@ -282,8 +291,31 @@ public class Renderer extends Module<Fluxe>{
 				}
 
 				color.set(closest);
-
-				pixmap.setColor(color);
+				*/
+				
+				float md = 3f;
+				float shade = 0f;
+				Color closest = null;
+				
+				for(Color c : colors){
+					//float rd =  c.r /color.r;
+					//float gd =  c.g /color.g;
+					//float bd =  c.b /color.b;
+					
+					float max1 = Math.max(Math.max(c.r, c.g), c.b);
+					float max2 = Math.max(Math.max(color.r, color.g), color.b);
+					//float delta = 0.15f;
+					
+					float dif = abs(c.r/max1 - color.r/max2) + abs(c.g/max1 - color.g/max2) + abs(c.b/max1 - color.b/max2);
+					
+					if(dif < md){
+						closest = c.cpy();
+						md = dif;
+						shade = (int)(1f/(((c.r /color.r + c.g/color.g + c.b/color.b)/3f))/0.2f)*0.2f;
+					}
+				}
+				
+				pixmap.setColor(closest.mul(shade, shade, shade, 1f));
 				pixmap.drawPixel(x, y);
 			}
 		}

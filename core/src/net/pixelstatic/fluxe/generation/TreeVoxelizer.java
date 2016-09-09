@@ -7,7 +7,7 @@ import net.pixelstatic.utils.MiscUtils;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 
-public class TreeGenerator{
+public class TreeVoxelizer implements Voxelizer{
 	boolean generated = false;
 	int bark = Color.valueOf("965f18").toIntBits();
 	int leaves = Color.valueOf("439432").toIntBits();
@@ -100,6 +100,8 @@ public class TreeGenerator{
 				disc(size/2,y,size/2,4+(6-y)/3, bark);
 			}
 		}
+		
+		disc2(size/2,trunk+1,size/2,(voxels.length-(trunk+1))/5 - ((trunk+1) % 3)*2+3, leaves);
 		
 		for(int y = trunk+1;y < voxels.length-6;y ++){
 			disc(size/2,y,size/2,(voxels.length-y)/5 - (y % 3)*2+3, leaves);

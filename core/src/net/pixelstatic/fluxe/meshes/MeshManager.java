@@ -83,8 +83,6 @@ public class MeshManager{
 	}
 
 	public Model generateVoxelModel(int[][][] voxels){
-		
-		
 		Mesh[] meshes = cubes.createVoxelMesh(voxels);
 		
 		modelBuilder.begin();

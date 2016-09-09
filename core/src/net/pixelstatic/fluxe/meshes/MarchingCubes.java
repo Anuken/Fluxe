@@ -10,9 +10,9 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
 
 public class MarchingCubes{
-	int width = 50, height = 50, depth = 50;
-	int[][][] grid;
-	boolean splitTriangles = false;
+	static private int width = 50, height = 50, depth = 50;
+	static private int[][][] grid;
+	static private boolean splitTriangles = false;
 
 	/*
 	public Mesh[] createVoxelMesh(int[][][] grid){
@@ -67,8 +67,8 @@ public class MarchingCubes{
 	}
 	*/
 
-	public Mesh[] createVoxelMesh(int[][][] grid){
-		this.grid = grid;
+	public static Mesh[] createVoxelMesh(int[][][] grid){
+		MarchingCubes.grid = grid;
 		width = grid.length;
 		height = grid[0].length;
 		depth = grid[0][0].length;
@@ -154,7 +154,8 @@ public class MarchingCubes{
 		print("Number of meshes: " + meshes.size);
 
 		print("Time to generate: " + TimeUtils.timeSinceMillis(timeStart) + "ms");
-
+		
+		grid = null;
 		return meshes.toArray(Mesh.class);
 	}
 
@@ -175,7 +176,7 @@ public class MarchingCubes{
 			}
 		}
 	*/
-	void splitMeshes(Array<Mesh> meshes, float[] vertices, int[] indices){
+	static private void splitMeshes(Array<Mesh> meshes, float[] vertices, int[] indices){
 		VertexAttributes attributes = MeshBuilder.createAttributes(Usage.Position | Usage.Normal | Usage.ColorPacked);
 		
 		while(true){
@@ -235,7 +236,7 @@ public class MarchingCubes{
 		
 	}
 
-	void fixTriangles(FloatArray vertices, IntArray indices){
+	static private void fixTriangles(FloatArray vertices, IntArray indices){
 		float[] verticearray = vertices.toArray();
 		int[] indicearray = indices.toArray();
 
@@ -256,7 +257,7 @@ public class MarchingCubes{
 		}
 	}
 
-	float[] addNormals(float[] vertices, int[] indices){
+	static private float[] addNormals(float[] vertices, int[] indices){
 		float[] normals = new float[2 * vertices.length];
 
 		//temporary vector
@@ -373,7 +374,7 @@ public class MarchingCubes{
 		return normals;
 	}
 
-	float[] addColors(float[] vertices){
+	static private float[] addColors(float[] vertices){
 		float[] colors = new float[(int)(vertices.length * (7f / 6f) + 1)];
 
 		if( !splitTriangles){
@@ -420,7 +421,7 @@ public class MarchingCubes{
 		return colors;
 	}
 
-	int getColor(float x, float y, float z){
+	static private int getColor(float x, float y, float z){
 		float r = 2f;
 		float sx = x < width/2 ? 1 : -1, sz = z < depth /2 ? 1 : -1;
 		
@@ -437,7 +438,7 @@ public class MarchingCubes{
 		return 0;
 	}
 
-	class OctreeNode{
+	static class OctreeNode{
 		OctreeNode nwu, neu, swu, seu;
 		OctreeNode nwd, ned, swd, sed;
 		OctreeNode up;
@@ -846,7 +847,7 @@ public class MarchingCubes{
 			{0, 3, 8, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
 			{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}};
 
-	class vec3{
+	static private class vec3{
 		float x, y, z;
 
 		public vec3(){
@@ -859,7 +860,7 @@ public class MarchingCubes{
 		}
 	}
 
-	vec3 VertexInterp2(float isolevel, vec3 p1, vec3 p2, float valp1, float valp2){
+	static private vec3 VertexInterp2(float isolevel, vec3 p1, vec3 p2, float valp1, float valp2){
 
 		if(Math.abs(isolevel - valp1) < 0.00001) return (p1);
 		if(Math.abs(isolevel - valp2) < 0.00001) return (p2);
@@ -874,16 +875,17 @@ public class MarchingCubes{
 
 		return (p);
 	}
-
-	int index(int x, int y, int z){
+/*
+	static private int index(int x, int y, int z){
 		return (z) * (width) * (height) + (y) * (width) + (x);
 	}
+	*/
 
-	void printf(String string, Object...args){
+	static private void printf(String string, Object...args){
 		System.out.printf(string, args);
 	}
 
-	void print(String string){
+	static private void print(String string){
 		System.out.println(string);
 	}
 }

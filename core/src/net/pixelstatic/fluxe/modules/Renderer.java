@@ -5,11 +5,11 @@ import static java.lang.Math.abs;
 import java.nio.ByteBuffer;
 
 import net.pixelstatic.fluxe.Fluxe;
-import net.pixelstatic.fluxe.generation.TreeGenerator;
+import net.pixelstatic.fluxe.generation.TreeVoxelizer;
 import net.pixelstatic.fluxe.meshes.MeshManager;
 import net.pixelstatic.gdxutils.graphics.FrameBufferMap;
 import net.pixelstatic.gdxutils.graphics.PixmapUtils;
-import net.pixelstatic.utils.modules.Module;
+import net.pixelstatic.gdxutils.modules.Module;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -44,7 +44,7 @@ public class Renderer extends Module<Fluxe>{
 	public boolean pixelate = false;
 	public Array<Model> models = new Array<Model>();
 	public Array<ModelInstance> modelInstances = new Array<ModelInstance>();
-	public TreeGenerator generator = new TreeGenerator();
+	public TreeVoxelizer generator = new TreeVoxelizer();
 	public boolean shadows = true, oil = true;
 	int[][][] voxels;
 	ShaderProgram shader;

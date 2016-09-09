@@ -2,73 +2,38 @@ package net.pixelstatic.fluxe.meshes;
 
 import net.pixelstatic.utils.MiscUtils;
 
-import com.badlogic.gdx.graphics.Mesh;
-import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
 
-public class MarchingCubes{
+public class VoxelVisualizer{
 	static private int width = 50, height = 50, depth = 50;
 	static private int[][][] grid;
 	static private boolean splitTriangles = false;
+	static private ModelBuilder builder = new ModelBuilder();
+	
+	private VoxelVisualizer(){}
+	
+	public static Model generateVoxelModel(int[][][] voxels){
+		Mesh[] meshes = VoxelVisualizer.createVoxelMesh(voxels);
 
-	/*
-	public Mesh[] createVoxelMesh(int[][][] grid){
-		this.grid = grid;
-		Array<Mesh> meshes = new Array<Mesh>();
+		builder.begin();
+		int i = 0;
 
-		width = grid.length;
-		height = grid[0].length;
-		depth = grid[0][0].length;
-
-		/*
-		Result result = march(0,0,0);
-		if(!result.done()){
-			throw new GdxRuntimeException("Too many vertices.");
+		for(Mesh mesh : meshes){
+			builder.part("mesh" + i ++, mesh, GL20.GL_TRIANGLES, new Material());
 		}
-		
-		meshes.add(result.mesh);
-		
 
-		int offsetx = 0, offsety = 0, offsetz = 0;
-		Result result = null;
-
-		while(true){
-
-			result = march(offsetx, offsety, offsetz);
-
-			meshes.add(result.mesh);
-			if(result.done()){
-				break;
-			}
-
-			offsetx = result.offsetx;
-			offsety = result.offsety;
-			offsetz = result.offsetz;
-
-		}
-		//meshes.removeIndex(0);
-		System.out.println("\n\nTotal Meshes: " + meshes.size);
-		/*
-		for(result = march(offsetx, offsety, offsetz); !result.done();){
-			System.out.println("Iterating: " + meshes.size);
-			meshes.add(result.mesh);
-			offsetx = result.offsetx;
-			offsety = result.offsety;
-			offsetz = result.offsetz;
-			System.out.printf("offsetx: %d, offsety: %d, offsetz: %d", offsetx, offsety, offsetz);
-		}
-		
-		//meshes.add(result.mesh);
-
-		return meshes.toArray(Mesh.class);
+		return builder.end();
 	}
-	*/
 
 	public static Mesh[] createVoxelMesh(int[][][] grid){
-		MarchingCubes.grid = grid;
+		VoxelVisualizer.grid = grid;
 		width = grid.length;
 		height = grid[0].length;
 		depth = grid[0][0].length;
@@ -194,46 +159,6 @@ public class MarchingCubes{
 			meshes.add(mesh);
 			break;
 		}
-		
-		
-		
-		/*
-		//int max = Short.MAX_VALUE - 3;
-		int maxVertices = (int)((int)(((Short.MAX_VALUE * (splitTriangles ? 1 : 3)) - 3)/3f)/7f)*7*7*3;
-
-		int meshAmount = vertices.length / maxVertices + 1;
-		
-		int maxIndices = 0;
-
-		System.out.println(meshAmount);
-
-		for(int num = 0;num < meshAmount;num ++){
-			FloatArray currentvertices = new FloatArray();
-			ShortArray currentindices = new ShortArray();
-			
-			for(int i = num*maxVertices; i < num*maxVertices + maxVertices && i < vertices.length;i ++){
-				currentvertices.add(vertices[i]);
-				//System.out.println(indices.length);
-				//if(i % 7 == 0) currentindices.add(indices[i / 7]- (num*maxVertices/7));
-			}
-			
-			for(int i = num*maxIndices; i < num*maxIndices + maxIndices && i < indices.length;i ++){
-				currentindices.add(indices[i]- (num*maxIndices));
-			}
-			
-			Mesh mesh = new Mesh(true, currentvertices.size, currentindices.size, attributes);
-			mesh.setVertices(currentvertices.toArray());
-			mesh.setIndices(currentindices.toArray());
-			meshes.add(mesh);
-		}
-
-		//for(int i = 0){
-
-		//}
-		 * 
-		 */
-		
-		
 	}
 
 	static private void fixTriangles(FloatArray vertices, IntArray indices){
@@ -295,9 +220,6 @@ public class MarchingCubes{
 			normals[c * 2 + 0 + 3] += v.x;
 			normals[c * 2 + 1 + 3] += v.y;
 			normals[c * 2 + 2 + 3] += v.z;
-
-			//	if(i < 3)
-			//		System.out.printf("a: %d, b: %d, c: %d -[]- x1: %f, y1: %f, z1: %f -[]- x2: %f, y2: %f, z2: %f -[]- x3: %f, y3: %f, z3: %f\n", a, b, c, x1, y1, z1, x2, y2, z2, x3, y3, z3);
 		}
 
 		//normalize final normals
@@ -309,58 +231,11 @@ public class MarchingCubes{
 			float nz = normals[o + 2 + 3];
 
 			v.set(nx, ny, nz).nor();
-			//	System.out.println(v);
 
 			normals[o + 0 + 3] = v.x;
 			normals[o + 1 + 3] = v.y;
 			normals[o + 2 + 3] = v.z;
 		}
-
-		/*
-		for(int i = 0; i < vertices.length/9-1; i ++){
-			int vindex = i*3;
-			
-			int a = indices[vindex]*3;
-			int b = indices[vindex+1]*3;
-			int c = indices[vindex+2]*3;
-			
-			if(i < 6){
-				System.out.printf("a: %d, b: %d, c: %d\n", a, b, c);
-			}
-			
-			float x1 = vertices[a+0];
-			float y1 = vertices[a+1];
-			float z1 = vertices[a+2];
-			
-			float x2 = vertices[b+0];
-			float y2 = vertices[b+1];
-			float z2 = vertices[b+2];
-			
-			float x3 = vertices[c+0];
-			float y3 = vertices[c+1];
-			float z3 = vertices[c+2];
-			
-			v1.set(x3 - x1, y3 - y1, z3 - z1).crs(x2 - x1, y2 - y1, z2 - z1).nor();
-			
-			
-			int noff = i*3*2;
-			if(i < 6)
-			System.out.println("noff: " + noff);
-			
-			normals[a*2+3] += v1.x;
-			normals[a*2+4] += v1.y;
-			normals[a*2+5] += v1.z;
-			
-			normals[b*2+3] += v1.x;
-			normals[b*2+4] += v1.y;
-			normals[b*2+5] += v1.z;
-			
-			normals[c*2+3] += v1.x;
-			normals[c*2+4] += v1.y;
-			normals[c*2+5] += v1.z;
-			
-		}
-		*/
 
 		//add vertices
 		for(int i = 0;i < (vertices.length) * 2;i ++){
@@ -875,11 +750,6 @@ public class MarchingCubes{
 
 		return (p);
 	}
-/*
-	static private int index(int x, int y, int z){
-		return (z) * (width) * (height) + (y) * (width) + (x);
-	}
-	*/
 
 	static private void printf(String string, Object...args){
 		System.out.printf(string, args);

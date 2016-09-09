@@ -21,7 +21,6 @@ public class MeshManager{
 	private final Vector3[] vectors = new Vector3[8];
 	private final MeshBuilder meshBuilder = new MeshBuilder();
 	private final ModelBuilder modelBuilder = new ModelBuilder();
-	private final MarchingCubes cubes = new MarchingCubes();
 
 	private Array<Mesh> meshes;
 
@@ -83,7 +82,7 @@ public class MeshManager{
 	}
 
 	public Model generateVoxelModel(int[][][] voxels){
-		Mesh[] meshes = cubes.createVoxelMesh(voxels);
+		Mesh[] meshes = VoxelVisualizer.createVoxelMesh(voxels);
 		
 		modelBuilder.begin();
 		int i = 0;

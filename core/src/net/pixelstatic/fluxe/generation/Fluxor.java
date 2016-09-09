@@ -1,11 +1,21 @@
 package net.pixelstatic.fluxe.generation;
 
+import net.pixelstatic.gdxutils.ValueMap;
+
 public class Fluxor{
 	private Voxelizer generator;
 	private Rasterizer filter;
+	private ValueMap values;
 	
 	public Fluxor(Voxelizer generator){
 		this.generator = generator;
+		values = new ValueMap();
+		values.put("pixelscale", 10);
+		values.put("size", 50);
+	}
+	
+	public ValueMap getValues(){
+		return values;
 	}
 	
 	public Voxelizer getVoxelizer(){

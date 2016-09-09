@@ -1,14 +1,11 @@
 package net.pixelstatic.fluxe.modules;
 
-import static java.lang.Math.abs;
-
 import java.nio.ByteBuffer;
 
 import net.pixelstatic.fluxe.Fluxe;
-import net.pixelstatic.fluxe.generation.TreeVoxelizer;
-import net.pixelstatic.fluxe.meshes.MeshManager;
+import net.pixelstatic.fluxe.generation.*;
+import net.pixelstatic.fluxe.meshes.VoxelVisualizer;
 import net.pixelstatic.gdxutils.graphics.FrameBufferMap;
-import net.pixelstatic.gdxutils.graphics.PixmapUtils;
 import net.pixelstatic.gdxutils.modules.Module;
 
 import com.badlogic.gdx.Gdx;
@@ -30,14 +27,13 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 @SuppressWarnings("deprecation")
-public class Renderer extends Module<Fluxe>{
+public class FluxViewer extends Module<Fluxe>{
 	public Environment environment;
 	public Camera cam;
 	public ModelBatch modelBatch, shadowBatch;
 	public SpriteBatch batch;
 	public FirstPersonCameraController camController;
 	public FrameBufferMap buffers = new FrameBufferMap();
-	public final MeshManager meshes = new MeshManager();
 	public DirectionalShadowLight shadowLight;
 	public int pixelscale = 10;
 	public int size = 50;
@@ -48,8 +44,10 @@ public class Renderer extends Module<Fluxe>{
 	public boolean shadows = true, oil = true;
 	int[][][] voxels;
 	ShaderProgram shader;
+	Fluxor flux;
+	Rasterizer filter = new DefaultRasterizer();
 
-	public Renderer(){
+	public FluxViewer(){
 		ShaderProgram.pedantic = true;
 		shader = new ShaderProgram(Gdx.files.internal("shaders/default.vertex"), Gdx.files.internal("shaders/oilpaint.fragment"));
 		if( !shader.isCompiled()) throw new GdxRuntimeException("Couldn't compile shader: " + shader.getLog());
@@ -75,10 +73,10 @@ public class Renderer extends Module<Fluxe>{
 		batch = new SpriteBatch();
 
 		//buffers.add("pixel", Gdx.graphics.getBackBufferWidth() / pixelscale, Gdx.graphics.getBackBufferHeight() / pixelscale);
-		
+
 		//cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-	
+
 		cam.position.set(size * 4, size * 2, size * 4);
 		cam.lookAt(size * 2, size * 2, size * 2);
 		//cam.
@@ -109,7 +107,7 @@ public class Renderer extends Module<Fluxe>{
 			}
 		}
 		*/
-		Model model = meshes.generateVoxelModel(voxels);
+		Model model = VoxelVisualizer.generateVoxelModel(voxels);
 
 		add(model);
 
@@ -133,22 +131,19 @@ public class Renderer extends Module<Fluxe>{
 		if(Gdx.input.isKeyJustPressed(Keys.E)) pixelate = !pixelate;
 
 		if(Gdx.input.isKeyJustPressed(Keys.Q)) shadows = !shadows;
-		
+
 		if(Gdx.input.isKeyJustPressed(Keys.T)) oil = !oil;
-		
+
 		if(Gdx.input.isKeyJustPressed(Keys.O)){
 			Camera old = cam;
 			if(cam instanceof OrthographicCamera){
 				cam.position.set(size * 4, size * 2, size * 4);
-
-				
-				
 				cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 			}else{
 				cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 				((OrthographicCamera)cam).zoom = 0.4f;
 			}
-			
+
 			cam.position.set(old.position);
 			cam.lookAt(size * 2, size * 2, size * 2);
 			cam.near = 1f;
@@ -164,25 +159,24 @@ public class Renderer extends Module<Fluxe>{
 			models.clear();
 			modelInstances.clear();
 
-			Model model = meshes.generateVoxelModel(voxels);
+			Model model = VoxelVisualizer.generateVoxelModel(voxels);
 
 			add(model);
 		}
 
 		//camController.update();
-		
-	
+
 		if(shadows){
 			shadowLight.begin(Vector3.Zero, cam.direction);
 			shadowBatch.begin(shadowLight.getCamera());
-			Gdx.gl.glClearColor(0,0,0,0);
+			Gdx.gl.glClearColor(0, 0, 0, 0);
 			shadowBatch.render(modelInstances, environment);
 
 			shadowBatch.end();
 			shadowLight.end();
 		}else{
 			shadowLight.begin(Vector3.Zero, cam.direction);
-			Gdx.gl.glClearColor(1,1,1,0);
+			Gdx.gl.glClearColor(1, 1, 1, 0);
 			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 			shadowLight.end();
 		}
@@ -221,7 +215,7 @@ public class Renderer extends Module<Fluxe>{
 			pixels.put(bytes);
 			pixels.position(0);
 
-			pixmap = process(pixmap);
+			pixmap = filter.process(pixmap);
 
 			Texture texture = new Texture(pixmap);
 
@@ -235,125 +229,6 @@ public class Renderer extends Module<Fluxe>{
 		}
 	}
 
-	Color[] ramp = {hex("4e9449"), hex("3e723a"), hex("2e532b"), hex("254223"), hex("172916"), hex("965f18"),
-			hex("7c4f15"), hex("613e10"), hex("462d0c"), hex("38240b")};
-
-	Color hex(String s){
-		return Color.valueOf(s);
-	}
-	
-	
-	
-	Color leaves = Color.valueOf("965f18");
-	Color bark = Color.valueOf("439432");
-	
-	Color[] colors = {leaves, bark};
-
-	Pixmap process(Pixmap input){
-		Color color = new Color();
-
-		Pixmap pixmap = PixmapUtils.copy(input);
-
-		int blank = Color.rgba8888(0, 0, 0, 1);
-
-		for(int x = 0;x < input.getWidth();x ++){
-			for(int y = 0;y < input.getHeight();y ++){
-				int i = input.getPixel(x, y);
-
-				//	if(alpha(i) == 0) continue;
-
-				color.set(i);
-
-				if(color.a + color.r + color.g + color.b < 1.001f || color.r + color.g + color.b >= 2.3f){
-
-					pixmap.drawPixel(x, y, blank);
-					continue;
-				}
-
-				//if(color.a < 0.001f && false){
-				//	if( !empty(input.getPixel(x + 1, y)) || !empty(input.getPixel(x - 1, y)) || !empty(input.getPixel(x, y + 1)) || !empty(input.getPixel(x, y - 1))) color.set(1, 1, 1, 1);
-				//}else{
-				//color.r = round(color.r);
-				//color.g = round(color.g);
-				//color.b = round(color.b);
-				//}
-				
-				/*
-				float md = 3f;
-				Color closest = null;
-				for(Color c : ramp){
-					float diff = Math.abs(c.r - color.r) + Math.abs(c.g - color.g) + Math.abs(c.b - color.b);
-
-					if(diff < md){
-						closest = c;
-						md = diff;
-					}
-				}
-
-				color.set(closest);
-				*/
-				
-				float md = 3f;
-				float shade = 0f;
-				Color closest = null;
-				
-				for(Color c : colors){
-					//float rd =  c.r /color.r;
-					//float gd =  c.g /color.g;
-					//float bd =  c.b /color.b;
-					
-					float max1 = Math.max(Math.max(c.r, c.g), c.b);
-					float max2 = Math.max(Math.max(color.r, color.g), color.b);
-					//float delta = 0.15f;
-					
-					float dif = abs(c.r/max1 - color.r/max2) + abs(c.g/max1 - color.g/max2) + abs(c.b/max1 - color.b/max2);
-					
-					if(dif < md){
-						closest = c.cpy();
-						md = dif;
-						shade = (int)(1f/(((c.r /color.r + c.g/color.g + c.b/color.b)/3f))/0.2f)*0.2f;
-					}
-				}
-				
-				pixmap.setColor(closest.mul(shade, shade, shade, 1f));
-				pixmap.drawPixel(x, y);
-			}
-		}
-
-		for(int x = 0;x < input.getWidth();x ++){
-			for(int y = 0;y < input.getHeight();y ++){
-				input.drawPixel(x, y, pixmap.getPixel(x, y));
-			}
-		}
-		/*
-		//smooth colors
-		for(int x = 0;x < pixmap.getWidth();x ++){
-			for(int y = 0;y < pixmap.getHeight();y ++){
-				int c = input.getPixel(x, y);
-				
-				if(input.getPixel(x, y+1) != c && input.getPixel(x, y-1) != c && input.getPixel(x+1, y) != c && input.getPixel(x-1, y) != c){
-					pixmap.setColor(input.getPixel(x, y+1));
-					//pixmap.drawPixel(x,y);
-				}
-			}
-		}
-		*/
-		return pixmap;
-	}
-
-	public float round(float input){
-		float f = 0.1f;
-		return (int)(input / f) * f;
-	}
-
-	public boolean empty(int value){
-		return alpha(value) == 0;
-	}
-
-	public int alpha(int value){
-		return ((value & 0x000000ff));
-	}
-
 	public int pixWidth(){
 		return Gdx.graphics.getWidth() / pixelscale;
 	}
@@ -361,8 +236,6 @@ public class Renderer extends Module<Fluxe>{
 	public int pixHeight(){
 		return Gdx.graphics.getHeight() / pixelscale;
 	}
-
-	//public 
 
 	@Override
 	public void resize(int width, int height){
@@ -376,8 +249,11 @@ public class Renderer extends Module<Fluxe>{
 	public void dispose(){
 		for(Model model : models)
 			model.dispose();
-		modelBatch.dispose();
+
 		batch.dispose();
+		modelBatch.dispose();
 		shadowBatch.dispose();
+		shader.dispose();
+		buffers.dispose();
 	}
 }

@@ -30,7 +30,7 @@ public class Input extends Module<Fluxe> implements InputProcessor{
 	}
 
 	public void update(float deltaTime){
-		camera = getModule(Renderer.class).cam;
+		camera = getModule(Crux.class).cam;
 		if(keys.containsKey(FORWARD)){
 			if(camera instanceof OrthographicCamera){
 				((OrthographicCamera)camera).zoom -= 1 / 80f;
@@ -69,7 +69,7 @@ public class Input extends Module<Fluxe> implements InputProcessor{
 	}
 
 	public void init(){
-		camera = getModule(Renderer.class).cam;
+		camera = getModule(Crux.class).cam;
 	}
 
 	@Override

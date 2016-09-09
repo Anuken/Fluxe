@@ -9,8 +9,8 @@ import com.badlogic.gdx.math.Vector2;
 
 public class TreeVoxelizer implements Voxelizer{
 	boolean generated = false;
-	int bark = Color.valueOf("965f18").toIntBits();
-	int leaves = Color.valueOf("439432").toIntBits();
+	static int bark = Color.valueOf("965f18").toIntBits();
+	static int leaves = Color.valueOf("439432").toIntBits();
 	int[][][] write;
 	int[][][] voxels;
 	int size;

@@ -23,7 +23,7 @@ public class TreeVoxelizer implements Voxelizer{
 		write = new int[size][size][size];
 		this.size = size;
 		
-		 voxels[size/2][1][size/2] = 2;
+		 //voxels[size/2][1][size/2] = 2;
 		 //voxels[size/2+2][1][size/2+2] = 2;
 		// voxels[size/2-2][1][size/2+4] = 2;
 		
@@ -93,8 +93,8 @@ public class TreeVoxelizer implements Voxelizer{
 	void generate(){
 		int trunk = 9;
 		
-		for(int y = 2;y < trunk+1;y ++){
-			if(y == 2){
+		for(int y = 3;y < trunk+1;y ++){
+			if(y == 3){
 				disc2(size/2,y,size/2,4+(6-y+1)/3, bark);
 			}else{
 				disc(size/2,y,size/2,4+(6-y)/3, bark);
@@ -230,7 +230,7 @@ public class TreeVoxelizer implements Voxelizer{
 	}
 
 	void place(int x, int y, int z, int color){
-		if( !MiscUtils.inBounds(x, y, z, voxels.length, 1)) return;
-		voxels[x][y][z] = color;
+		if( !MiscUtils.inBounds(x, y+1, z, voxels.length, 1)) return;
+		voxels[x][y+1][z] = color;
 	}
 }

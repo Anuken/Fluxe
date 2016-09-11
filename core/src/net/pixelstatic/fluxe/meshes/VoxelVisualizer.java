@@ -16,6 +16,7 @@ public class VoxelVisualizer{
 	static private int[][][] grid;
 	static private boolean splitTriangles = false;
 	static private ModelBuilder builder = new ModelBuilder();
+	static private int defcolor = Color.rgba8888(Color.valueOf("439432"));
 	
 	private VoxelVisualizer(){}
 	
@@ -310,7 +311,7 @@ public class VoxelVisualizer{
 				}
 			}
 		}
-		return 0;
+		return defcolor;
 	}
 
 	static class OctreeNode{

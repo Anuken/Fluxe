@@ -1,10 +1,10 @@
 package net.pixelstatic.fluxe.generation;
 
 import static java.lang.Math.abs;
-import net.pixelstatic.gdxutils.graphics.PixmapUtils;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Pixmap.Format;
 
 public class DefaultRasterizer implements Rasterizer{
 
@@ -19,15 +19,15 @@ public class DefaultRasterizer implements Rasterizer{
 	public Pixmap process(Pixmap input){
 		Color color = new Color();
 
-		Pixmap pixmap = PixmapUtils.copy(input);
+		Pixmap pixmap = new Pixmap(input.getWidth(), input.getHeight(), Format.RGBA8888);
 
-		int blank = Color.rgba8888(0, 0, 0, 1);
+		int blank = Color.rgba8888(0, 0, 0, 0);
 
 		for(int x = 0;x < input.getWidth();x ++){
 			for(int y = 0;y < input.getHeight();y ++){
 				int i = input.getPixel(x, y);
 
-				//	if(alpha(i) == 0) continue;
+				if(Math.abs(i - blank) < 100) continue;
 
 				color.set(i);
 

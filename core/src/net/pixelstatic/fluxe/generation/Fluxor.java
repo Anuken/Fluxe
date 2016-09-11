@@ -7,8 +7,9 @@ public class Fluxor{
 	private Rasterizer filter;
 	private ValueMap values;
 	
-	public Fluxor(Voxelizer generator){
+	public Fluxor(Voxelizer generator, Rasterizer filter){
 		this.generator = generator;
+		this.filter = filter;
 		values = new ValueMap();
 		values.put("pixelscale", 10);
 		values.put("size", 50);
@@ -32,5 +33,9 @@ public class Fluxor{
 	
 	public void setRasterizer(Rasterizer filter){
 		this.filter = filter;
+	}
+	
+	public int[][][] generate(){
+		return generator.generate(values.getInt("size"));
 	}
 }

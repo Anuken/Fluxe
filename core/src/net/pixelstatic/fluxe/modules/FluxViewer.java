@@ -6,6 +6,7 @@ import net.pixelstatic.fluxe.Fluxe;
 import net.pixelstatic.fluxe.generation.*;
 import net.pixelstatic.fluxe.meshes.VoxelVisualizer;
 import net.pixelstatic.gdxutils.graphics.FrameBufferMap;
+import net.pixelstatic.gdxutils.graphics.PixmapUtils;
 import net.pixelstatic.gdxutils.modules.Module;
 
 import com.badlogic.gdx.Gdx;
@@ -36,16 +37,15 @@ public class FluxViewer extends Module<Fluxe>{
 	public FrameBufferMap buffers = new FrameBufferMap();
 	public DirectionalShadowLight shadowLight;
 	public int pixelscale = 10;
-	public int size = 50;
 	public boolean pixelate = false;
 	public Array<Model> models = new Array<Model>();
 	public Array<ModelInstance> modelInstances = new Array<ModelInstance>();
-	public TreeVoxelizer generator = new TreeVoxelizer();
 	public boolean shadows = true, oil = true;
-	int[][][] voxels;
 	ShaderProgram shader;
 	Fluxor flux;
+	int[][][] voxels;
 	Rasterizer filter = new DefaultRasterizer();
+	Crux crux = new Crux();
 
 	public FluxViewer(){
 		ShaderProgram.pedantic = true;
@@ -75,6 +75,11 @@ public class FluxViewer extends Module<Fluxe>{
 		//buffers.add("pixel", Gdx.graphics.getBackBufferWidth() / pixelscale, Gdx.graphics.getBackBufferHeight() / pixelscale);
 
 		//cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+		flux = new Fluxor(new TreeVoxelizer(), new DefaultRasterizer());
+
+		int size = flux.getValues().getInt("size");
+
 		cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
 		cam.position.set(size * 4, size * 2, size * 4);
@@ -86,7 +91,7 @@ public class FluxViewer extends Module<Fluxe>{
 
 		//camController = new FirstPersonCameraController(cam);
 
-		voxels = generator.generate(size);
+		voxels = flux.generate();
 
 		/*
 		for(int x = 0;x < voxels.length;x ++){
@@ -112,6 +117,7 @@ public class FluxViewer extends Module<Fluxe>{
 		add(model);
 
 		//add(new ModelBuilder().createXYZCoordinates(5, new Material(ColorAttribute.createDiffuse(Color.BLUE)), Usage.Position | Usage.Normal));
+
 	}
 
 	void add(Model model){
@@ -123,6 +129,13 @@ public class FluxViewer extends Module<Fluxe>{
 
 	@Override
 	public void update(){
+		if(Gdx.input.isKeyJustPressed(Keys.NUM_1)){
+			Pixmap pixmap = crux.render(flux);
+			Pixmap out = PixmapUtils.scale(pixmap, 5);
+			PixmapIO.writePNG(Gdx.files.local("tree.png"), out);
+			pixmap.dispose();
+			out.dispose();
+		}
 
 		if(Gdx.input.isKeyJustPressed(Keys.ESCAPE)){
 			Gdx.app.exit();
@@ -137,7 +150,7 @@ public class FluxViewer extends Module<Fluxe>{
 		if(Gdx.input.isKeyJustPressed(Keys.O)){
 			Camera old = cam;
 			if(cam instanceof OrthographicCamera){
-				cam.position.set(size * 4, size * 2, size * 4);
+				cam.position.set(50 * 4, 50 * 2, 50 * 4);
 				cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 			}else{
 				cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -145,14 +158,14 @@ public class FluxViewer extends Module<Fluxe>{
 			}
 
 			cam.position.set(old.position);
-			cam.lookAt(size * 2, size * 2, size * 2);
+			cam.lookAt(50 * 2, 50 * 2, 50 * 2);
 			cam.near = 1f;
 			cam.far = 1000f;
 			cam.update();
 		}
 
 		if(Gdx.input.isKeyJustPressed(Keys.R)){
-			voxels = generator.generate(size);
+			voxels = flux.generate();
 
 			for(Model model : models)
 				model.dispose();
@@ -227,6 +240,7 @@ public class FluxViewer extends Module<Fluxe>{
 			texture.dispose();
 			pixmap.dispose();
 		}
+
 	}
 
 	public int pixWidth(){
@@ -243,6 +257,7 @@ public class FluxViewer extends Module<Fluxe>{
 		cam.viewportHeight = height;
 		cam.update();
 		batch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
+		crux.resize(width, height);
 	}
 
 	@Override

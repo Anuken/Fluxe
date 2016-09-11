@@ -30,7 +30,11 @@ public class Input extends Module<Fluxe> implements InputProcessor{
 	}
 
 	public void update(float deltaTime){
-		camera = getModule(Crux.class).cam;
+		if(Gdx.input.isKeyJustPressed(Keys.NUM_1)){
+			
+		}
+		
+		camera = getModule(FluxViewer.class).cam;
 		if(keys.containsKey(FORWARD)){
 			if(camera instanceof OrthographicCamera){
 				((OrthographicCamera)camera).zoom -= 1 / 80f;
@@ -69,7 +73,7 @@ public class Input extends Module<Fluxe> implements InputProcessor{
 	}
 
 	public void init(){
-		camera = getModule(Crux.class).cam;
+		camera = getModule(FluxViewer.class).cam;
 	}
 
 	@Override

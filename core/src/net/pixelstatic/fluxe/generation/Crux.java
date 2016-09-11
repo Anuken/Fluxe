@@ -1,23 +1,18 @@
-package net.pixelstatic.fluxe.modules;
+package net.pixelstatic.fluxe.generation;
 
 import java.nio.ByteBuffer;
 
-import net.pixelstatic.fluxe.generation.DefaultRasterizer;
-import net.pixelstatic.fluxe.generation.Fluxor;
-import net.pixelstatic.fluxe.generation.Rasterizer;
 import net.pixelstatic.fluxe.meshes.VoxelVisualizer;
 import net.pixelstatic.gdxutils.graphics.FrameBufferMap;
+import net.pixelstatic.gdxutils.graphics.PixmapUtils;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight;
-import com.badlogic.gdx.graphics.g3d.shaders.DepthShader;
-import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector3;
@@ -34,7 +29,7 @@ public class Crux implements Disposable{
 	public FirstPersonCameraController camController;
 	public FrameBufferMap buffers = new FrameBufferMap();
 	public DirectionalShadowLight shadowLight;
-	public boolean pixelate = false;
+	public int vwidth = 100, vheight = 200;
 	ShaderProgram shader;
 	Rasterizer filter = new DefaultRasterizer();
 
@@ -52,33 +47,38 @@ public class Crux implements Disposable{
 
 		environment.shadowMap = shadowLight;
 
-		FileHandle fragshader = Gdx.files.internal("shaders/depth.fragment");
-
-		DepthShaderProvider provider = new DepthShaderProvider(DepthShader.getDefaultVertexShader(), fragshader.readString());
-
-		provider.config.defaultCullFace = GL20.GL_FRONT;
-
 		modelBatch = new ModelBatch();
-		shadowBatch = new ModelBatch(provider);
+		shadowBatch = new ModelBatch();
 		batch = new SpriteBatch();
 
-		//cam = new OrthographicCamera(swidth(), sheight());
-		cam = new PerspectiveCamera(67, swidth(), sheight());
+		cam = new OrthographicCamera(swidth(), sheight());
+		((OrthographicCamera)cam).zoom = 0.27f;
+		//cam = new PerspectiveCamera(67, swidth(), sheight());
 	}
 
 	public Pixmap render(Fluxor flux){
-		int pixelscale = flux.getValues().getInt("pixelscale");
+		//int pixelscale = flux.getValues().getInt("pixelscale");
 		int size = flux.getValues().getInt("size");
-		int[][][] voxels = flux.getVoxelizer().generate(size);
+		int[][][] voxels = flux.generate();
+		//vheight = (int)(vwidth * ((float)sheight()/swidth()));
 		
-		cam.position.set(size * 4, size * 2, size * 4);
+		cam.position.set(size * 4+20, size * 3, size * 4+20);
 		cam.lookAt(size * 2, size * 2, size * 2);
+		
 		cam.near = 1f;
 		cam.far = 1000f;
+		//cam.translate(cam.direction.cpy().scl(0,0,500));
 		cam.update();
+		
 		
 		Model model = VoxelVisualizer.generateVoxelModel(voxels);
 		ModelInstance minstance = new ModelInstance(model);
+		float zoom = 0.15f;
+		float scale = 4f*zoom;
+		minstance.transform.setToTranslation(0, size, 0);
+		minstance.transform.scale(scale, scale, scale);
+		
+		//Gdx.gl.glViewport(0, 0, vwidth, vheight);
 
 		if(flux.getValues().getBoolean("shadows")){
 			shadowLight.begin(Vector3.Zero, cam.direction);
@@ -95,7 +95,6 @@ public class Crux implements Disposable{
 			shadowLight.end();
 		}
 
-		Gdx.gl.glViewport(0, 0, swidth() / pixelscale, sheight() / pixelscale);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
 		buffers.begin("pixel");
@@ -110,38 +109,64 @@ public class Crux implements Disposable{
 
 		buffers.end("pixel");
 
-		Gdx.gl.glViewport(0, 0, swidth() / pixelscale, sheight() / pixelscale);
+		//Gdx.gl.glViewport(0, 0, vwidth, vheight);
 		batch.setShader(flux.getValues().getBoolean("oil") ? shader : null);
 		batch.begin();
 
 		batch.draw(buffers.texture("pixel"), 0, sheight(), swidth(), -sheight());
 		batch.end();
 
-		Gdx.gl.glViewport(0, 0, swidth(), sheight());
+		//Gdx.gl.glViewport(0, 0, swidth(), sheight());
 
-		byte[] bytes = ScreenUtils.getFrameBufferPixels(0, 0, swidth()/pixelscale, sheight()/pixelscale, false);
+		byte[] bytes = ScreenUtils.getFrameBufferPixels(swidth()/2-vwidth/2, sheight()/2-vheight/2, vwidth, vheight, false);
 
-		Pixmap pixmap = new Pixmap(swidth()/pixelscale, sheight()/pixelscale, Format.RGBA8888);
+		Pixmap pixmap = new Pixmap(vwidth, vheight, Format.RGBA8888);
 
 		ByteBuffer pixels = pixmap.getPixels();
 		pixels.clear();
 		pixels.put(bytes);
 		pixels.position(0);
+		
+		int minx = pixmap.getWidth(), maxx = 0;
+		int miny = pixmap.getHeight(), maxy = 0;
+		
+		for(int x = 0; x < pixmap.getWidth(); x ++){
+			for(int y = 0; y < pixmap.getHeight(); y ++){
+				if(((pixmap.getPixel(x, y) & 0x000000ff)) != 0){
+					maxx = Math.max(maxx, x);
+					maxy = Math.max(maxy, y);
+					
+					minx = Math.min(minx, x);
+					miny = Math.min(miny, y);
+				}
+			}
+		}
+		
+		//System.out.printf("%d, %d, %d, %d\n", minx, miny, maxx, maxy);
+		Pixmap cropped = PixmapUtils.crop(pixmap, minx, miny, maxx - minx, maxy - miny);
+		pixmap.dispose();
+		pixmap = cropped;
+		flip(pixmap);
 
-		pixmap = flux.getRasterizer().process(pixmap);
-
-		Texture texture = new Texture(pixmap);
-
-		batch.setShader(null);
-		batch.begin();
-		batch.draw(texture, 0, sheight(), swidth(), -sheight());
-		batch.end();
-
-		texture.dispose();
+		Pixmap out = flux.getRasterizer().process(pixmap);
+		pixmap.dispose();
 		
 		model.dispose();
 		
-		return pixmap;
+		return out;
+	}
+	
+	void flip(Pixmap pixmap){
+		 ByteBuffer pixels = pixmap.getPixels();
+         int numBytes = pixmap.getWidth() * pixmap.getHeight() * 4;
+         byte[] lines = new byte[numBytes];
+         int numBytesPerLine = pixmap.getWidth() * 4;
+         for (int i = 0; i < pixmap.getHeight(); i++) {
+             pixels.position((pixmap.getHeight() - i - 1) * numBytesPerLine);
+             pixels.get(lines, i * numBytesPerLine, numBytesPerLine);
+         }
+         pixels.clear();
+         pixels.put(lines);
 	}
 	
 	public int swidth(){

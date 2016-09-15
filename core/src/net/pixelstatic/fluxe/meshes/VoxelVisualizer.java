@@ -1,6 +1,6 @@
 package net.pixelstatic.fluxe.meshes;
 
-import net.pixelstatic.utils.MiscUtils;
+import io.anuke.utils.MiscUtils;
 
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
@@ -109,11 +109,6 @@ public class VoxelVisualizer{
 
 		splitMeshes(meshes, newvertices, newindices);
 
-		//Mesh mesh = new Mesh(true, newvertices.length, newindices.length, MeshBuilder.createAttributes(Usage.Position | Usage.Normal | Usage.ColorPacked));
-
-		//mesh.setVertices(newvertices);
-		//mesh.setIndices(newindices);
-
 		printf("Mesh stats:\n");
 		printf("  %d vertices\n", (int)vertices.size);
 		printf("  %d triangles\n", (int)indices.size / 3);
@@ -125,23 +120,6 @@ public class VoxelVisualizer{
 		return meshes.toArray(Mesh.class);
 	}
 
-	/*
-		class Result{
-			Mesh mesh;
-			int offsetx, offsety, offsetz;
-
-			public Result(Mesh mesh, int offsetx, int offsety, int offsetz){
-				this.mesh = mesh;
-				this.offsetx = offsetx;
-				this.offsety = offsety;
-				this.offsetz = offsetz;
-			}
-
-			public boolean done(){
-				return offsetx == width - 2 && offsety == height - 2 && offsetz == depth - 2;
-			}
-		}
-	*/
 	static private void splitMeshes(Array<Mesh> meshes, float[] vertices, int[] indices){
 		VertexAttributes attributes = MeshBuilder.createAttributes(Usage.Position | Usage.Normal | Usage.ColorPacked);
 		

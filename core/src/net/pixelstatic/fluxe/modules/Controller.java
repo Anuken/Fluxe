@@ -1,9 +1,9 @@
 package net.pixelstatic.fluxe.modules;
 
+import io.anuke.gdxutils.graphics.PixmapUtils;
+import io.anuke.gdxutils.modules.Module;
 import net.pixelstatic.fluxe.Fluxe;
 import net.pixelstatic.fluxe.generation.*;
-import net.pixelstatic.gdxutils.graphics.PixmapUtils;
-import net.pixelstatic.gdxutils.modules.Module;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;

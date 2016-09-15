@@ -1,13 +1,14 @@
 package net.pixelstatic.fluxe.modules;
 
+import io.anuke.gdxutils.graphics.FrameBufferMap;
+import io.anuke.gdxutils.graphics.PixmapUtils;
+import io.anuke.gdxutils.modules.Module;
+
 import java.nio.ByteBuffer;
 
 import net.pixelstatic.fluxe.Fluxe;
 import net.pixelstatic.fluxe.generation.*;
 import net.pixelstatic.fluxe.meshes.VoxelVisualizer;
-import net.pixelstatic.gdxutils.graphics.FrameBufferMap;
-import net.pixelstatic.gdxutils.graphics.PixmapUtils;
-import net.pixelstatic.gdxutils.modules.Module;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;

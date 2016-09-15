@@ -1,10 +1,11 @@
 package net.pixelstatic.fluxe.generation;
 
+import io.anuke.gdxutils.graphics.FrameBufferMap;
+import io.anuke.gdxutils.graphics.PixmapUtils;
+
 import java.nio.ByteBuffer;
 
 import net.pixelstatic.fluxe.meshes.VoxelVisualizer;
-import net.pixelstatic.gdxutils.graphics.FrameBufferMap;
-import net.pixelstatic.gdxutils.graphics.PixmapUtils;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
@@ -29,7 +30,7 @@ public class Crux implements Disposable{
 	public FirstPersonCameraController camController;
 	public FrameBufferMap buffers = new FrameBufferMap();
 	public DirectionalShadowLight shadowLight;
-	public int vwidth = 100, vheight = 200;
+	public int vwidth = 104, vheight = 200;
 	ShaderProgram shader;
 	Rasterizer filter = new DefaultRasterizer();
 
@@ -53,21 +54,17 @@ public class Crux implements Disposable{
 
 		cam = new OrthographicCamera(swidth(), sheight());
 		((OrthographicCamera)cam).zoom = 0.27f;
-		//cam = new PerspectiveCamera(67, swidth(), sheight());
 	}
 
 	public Pixmap render(Fluxor flux){
-		//int pixelscale = flux.getValues().getInt("pixelscale");
 		int size = flux.getValues().getInt("size");
 		int[][][] voxels = flux.generate();
-		//vheight = (int)(vwidth * ((float)sheight()/swidth()));
 		
-		cam.position.set(size * 4+20, size * 3, size * 4+20);
+		cam.position.set(size * 4+20, size * 2+50, size * 4+20);
 		cam.lookAt(size * 2, size * 2, size * 2);
 		
 		cam.near = 1f;
 		cam.far = 1000f;
-		//cam.translate(cam.direction.cpy().scl(0,0,500));
 		cam.update();
 		
 		
@@ -78,7 +75,6 @@ public class Crux implements Disposable{
 		minstance.transform.setToTranslation(0, size, 0);
 		minstance.transform.scale(scale, scale, scale);
 		
-		//Gdx.gl.glViewport(0, 0, vwidth, vheight);
 
 		if(flux.getValues().getBoolean("shadows")){
 			shadowLight.begin(Vector3.Zero, cam.direction);
@@ -109,14 +105,11 @@ public class Crux implements Disposable{
 
 		buffers.end("pixel");
 
-		//Gdx.gl.glViewport(0, 0, vwidth, vheight);
 		batch.setShader(flux.getValues().getBoolean("oil") ? shader : null);
 		batch.begin();
 
 		batch.draw(buffers.texture("pixel"), 0, sheight(), swidth(), -sheight());
 		batch.end();
-
-		//Gdx.gl.glViewport(0, 0, swidth(), sheight());
 
 		byte[] bytes = ScreenUtils.getFrameBufferPixels(swidth()/2-vwidth/2, sheight()/2-vheight/2, vwidth, vheight, false);
 
@@ -142,7 +135,6 @@ public class Crux implements Disposable{
 			}
 		}
 		
-		//System.out.printf("%d, %d, %d, %d\n", minx, miny, maxx, maxy);
 		Pixmap cropped = PixmapUtils.crop(pixmap, minx, miny, maxx - minx, maxy - miny);
 		pixmap.dispose();
 		pixmap = cropped;

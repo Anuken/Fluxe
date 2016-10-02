@@ -1,15 +1,23 @@
 package net.pixelstatic.fluxe.meshes;
 
-import io.anuke.utils.MiscUtils;
-
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Mesh;
+import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.*;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.FloatArray;
+import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.NumberUtils;
+import com.badlogic.gdx.utils.ShortArray;
+import com.badlogic.gdx.utils.TimeUtils;
+
+import io.anuke.ucore.UCore;
 
 public class VoxelVisualizer{
 	static private int width = 50, height = 50, depth = 50;
@@ -283,7 +291,7 @@ public class VoxelVisualizer{
 			for(float my = -r; my < r;my ++){
 				for(float mz = -r*sz; sz*mz < r; mz += sz){
 					
-					if( !MiscUtils.inBounds((int)(x + mx), (int)(y + my), (int)(z + mz), grid)) continue;
+					if( !UCore.inBounds((int)(x + mx), (int)(y + my), (int)(z + mz), grid)) continue;
 					int i = grid[(int)(x + mx)][(int)(y + my)][(int)(z + mz)];
 					if(i != 0) return i;
 				}

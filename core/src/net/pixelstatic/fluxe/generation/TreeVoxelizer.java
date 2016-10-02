@@ -1,11 +1,11 @@
 package net.pixelstatic.fluxe.generation;
 
-import io.anuke.utils.MiscUtils;
-
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+
+import io.anuke.ucore.UCore;
 
 public class TreeVoxelizer implements Voxelizer{
 	static int bark = Color.valueOf("965f18").toIntBits();
@@ -101,7 +101,7 @@ public class TreeVoxelizer implements Voxelizer{
 	}
 
 	void place(int x, int y, int z, int color){
-		if( !MiscUtils.inBounds(x, y + 1, z, voxels.length, 1)) return;
+		if( !UCore.inBounds(x, y + 1, z, voxels.length, 1)) return;
 		voxels[x][y + 1][z] = color;
 	}
 }

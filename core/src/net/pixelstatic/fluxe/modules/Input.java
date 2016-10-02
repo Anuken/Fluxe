@@ -1,8 +1,5 @@
 package net.pixelstatic.fluxe.modules;
 
-import io.anuke.gdxutils.modules.Module;
-import net.pixelstatic.fluxe.Fluxe;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
@@ -10,6 +7,9 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.IntIntMap;
+
+import io.anuke.ucore.modules.Module;
+import net.pixelstatic.fluxe.Fluxe;
 
 public class Input extends Module<Fluxe> implements InputProcessor{
 	private final IntIntMap keys = new IntIntMap();

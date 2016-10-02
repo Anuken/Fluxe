@@ -1,6 +1,6 @@
 package net.pixelstatic.fluxe.generation;
 
-import io.anuke.gdxutils.ValueMap;
+import io.anuke.ucore.ValueMap;
 
 public class Fluxor{
 	private Voxelizer generator;

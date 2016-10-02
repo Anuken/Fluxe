@@ -1,17 +1,18 @@
 package net.pixelstatic.fluxe.generation;
 
-import io.anuke.gdxutils.graphics.FrameBufferMap;
-import io.anuke.gdxutils.graphics.PixmapUtils;
-
 import java.nio.ByteBuffer;
 
-import net.pixelstatic.fluxe.meshes.VoxelVisualizer;
-
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g3d.*;
+import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
@@ -20,6 +21,10 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ScreenUtils;
+
+import io.anuke.ucore.graphics.FrameBufferMap;
+import io.anuke.ucore.graphics.PixmapUtils;
+import net.pixelstatic.fluxe.meshes.VoxelVisualizer;
 
 @SuppressWarnings("deprecation")
 public class Crux implements Disposable{

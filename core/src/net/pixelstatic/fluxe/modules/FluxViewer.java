@@ -1,22 +1,23 @@
 package net.pixelstatic.fluxe.modules;
 
-import io.anuke.gdxutils.graphics.FrameBufferMap;
-import io.anuke.gdxutils.graphics.PixmapUtils;
-import io.anuke.gdxutils.modules.Module;
-
 import java.nio.ByteBuffer;
-
-import net.pixelstatic.fluxe.Fluxe;
-import net.pixelstatic.fluxe.generation.*;
-import net.pixelstatic.fluxe.meshes.VoxelVisualizer;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
+import com.badlogic.gdx.graphics.PixmapIO;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g3d.*;
+import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight;
 import com.badlogic.gdx.graphics.g3d.shaders.DepthShader;
@@ -27,6 +28,17 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ScreenUtils;
+
+import io.anuke.ucore.graphics.FrameBufferMap;
+import io.anuke.ucore.graphics.PixmapUtils;
+import io.anuke.ucore.modules.Module;
+import net.pixelstatic.fluxe.Fluxe;
+import net.pixelstatic.fluxe.generation.Crux;
+import net.pixelstatic.fluxe.generation.DefaultRasterizer;
+import net.pixelstatic.fluxe.generation.Fluxor;
+import net.pixelstatic.fluxe.generation.Rasterizer;
+import net.pixelstatic.fluxe.generation.TreeVoxelizer;
+import net.pixelstatic.fluxe.meshes.VoxelVisualizer;
 
 @SuppressWarnings("deprecation")
 public class FluxViewer extends Module<Fluxe>{

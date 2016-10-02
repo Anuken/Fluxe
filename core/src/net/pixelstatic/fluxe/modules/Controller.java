@@ -1,14 +1,20 @@
 package net.pixelstatic.fluxe.modules;
 
-import io.anuke.gdxutils.graphics.PixmapUtils;
-import io.anuke.gdxutils.modules.Module;
-import net.pixelstatic.fluxe.Fluxe;
-import net.pixelstatic.fluxe.generation.*;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.PixmapIO;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+
+import io.anuke.ucore.graphics.PixmapUtils;
+import io.anuke.ucore.modules.Module;
+import net.pixelstatic.fluxe.Fluxe;
+import net.pixelstatic.fluxe.generation.Crux;
+import net.pixelstatic.fluxe.generation.DefaultRasterizer;
+import net.pixelstatic.fluxe.generation.Fluxor;
+import net.pixelstatic.fluxe.generation.TreeVoxelizer;
 
 public class Controller extends Module<Fluxe>{
 	Crux crux = new Crux();

@@ -1,4 +1,4 @@
-package net.pixelstatic.fluxe.generation;
+package io.anuke.fluxe.generation;
 
 import java.nio.ByteBuffer;
 
@@ -22,9 +22,9 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ScreenUtils;
 
+import io.anuke.fluxe.meshes.VoxelVisualizer;
 import io.anuke.ucore.graphics.FrameBufferMap;
 import io.anuke.ucore.graphics.PixmapUtils;
-import net.pixelstatic.fluxe.meshes.VoxelVisualizer;
 
 @SuppressWarnings("deprecation")
 public class Crux implements Disposable{

@@ -1,4 +1,4 @@
-package net.pixelstatic.fluxe.generation;
+package io.anuke.fluxe.generation;
 
 import static java.lang.Math.abs;
 

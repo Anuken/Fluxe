@@ -1,4 +1,4 @@
-package net.pixelstatic.fluxe.meshes;
+package io.anuke.fluxe.meshes;
 
 import com.badlogic.gdx.math.Vector3;
 

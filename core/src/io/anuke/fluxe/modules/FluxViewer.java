@@ -1,4 +1,4 @@
-package net.pixelstatic.fluxe.modules;
+package io.anuke.fluxe.modules;
 
 import java.nio.ByteBuffer;
 
@@ -29,16 +29,16 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ScreenUtils;
 
+import io.anuke.fluxe.Fluxe;
+import io.anuke.fluxe.generation.Crux;
+import io.anuke.fluxe.generation.DefaultRasterizer;
+import io.anuke.fluxe.generation.Fluxor;
+import io.anuke.fluxe.generation.Rasterizer;
+import io.anuke.fluxe.generation.TreeVoxelizer;
+import io.anuke.fluxe.meshes.VoxelVisualizer;
 import io.anuke.ucore.graphics.FrameBufferMap;
 import io.anuke.ucore.graphics.PixmapUtils;
 import io.anuke.ucore.modules.Module;
-import net.pixelstatic.fluxe.Fluxe;
-import net.pixelstatic.fluxe.generation.Crux;
-import net.pixelstatic.fluxe.generation.DefaultRasterizer;
-import net.pixelstatic.fluxe.generation.Fluxor;
-import net.pixelstatic.fluxe.generation.Rasterizer;
-import net.pixelstatic.fluxe.generation.TreeVoxelizer;
-import net.pixelstatic.fluxe.meshes.VoxelVisualizer;
 
 @SuppressWarnings("deprecation")
 public class FluxViewer extends Module<Fluxe>{

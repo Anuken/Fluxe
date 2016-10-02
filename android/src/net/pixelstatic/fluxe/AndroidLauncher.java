@@ -1,10 +1,10 @@
 package net.pixelstatic.fluxe;
 
 import android.os.Bundle;
+import io.anuke.fluxe.Fluxe;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import net.pixelstatic.fluxe.Fluxe;
 
 public class AndroidLauncher extends AndroidApplication {
 	@Override

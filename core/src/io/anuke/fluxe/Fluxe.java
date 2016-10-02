@@ -1,7 +1,7 @@
-package net.pixelstatic.fluxe;
+package io.anuke.fluxe;
 
+import io.anuke.fluxe.modules.Controller;
 import io.anuke.ucore.modules.ModuleController;
-import net.pixelstatic.fluxe.modules.Controller;
 
 public class Fluxe extends ModuleController<Fluxe>{
 	

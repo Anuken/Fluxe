@@ -1,4 +1,4 @@
-package net.pixelstatic.fluxe.modules;
+package io.anuke.fluxe.modules;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -8,8 +8,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.IntIntMap;
 
+import io.anuke.fluxe.Fluxe;
 import io.anuke.ucore.modules.Module;
-import net.pixelstatic.fluxe.Fluxe;
 
 public class Input extends Module<Fluxe> implements InputProcessor{
 	private final IntIntMap keys = new IntIntMap();

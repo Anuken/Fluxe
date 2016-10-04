@@ -15,7 +15,6 @@ import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.ShortArray;
-import com.badlogic.gdx.utils.TimeUtils;
 
 import io.anuke.ucore.UCore;
 
@@ -47,14 +46,13 @@ public class VoxelVisualizer{
 		height = grid[0].length;
 		depth = grid[0][0].length;
 
-		long timeStart = TimeUtils.millis();
+		//long timeStart = TimeUtils.millis();
 
 		FloatArray vertices = new FloatArray();
 		IntArray indices = new IntArray();
 
 		OctreeNode octtree = new OctreeNode(0, null, 0.0, 0.0, 0.0, width, height, depth);
 
-		print("Marching cubes.");
 
 		for(int k = 0;k < depth - 1;k ++){
 			for(int j = 0;j < height - 1;j ++){
@@ -116,14 +114,14 @@ public class VoxelVisualizer{
 		Array<Mesh> meshes = new Array<Mesh>();
 
 		splitMeshes(meshes, newvertices, newindices);
-
+		/*
 		printf("Mesh stats:\n");
 		printf("  %d vertices\n", (int)vertices.size);
 		printf("  %d triangles\n", (int)indices.size / 3);
 		print("Number of meshes: " + meshes.size);
 
 		print("Time to generate: " + TimeUtils.timeSinceMillis(timeStart) + "ms");
-		
+		*/
 		grid = null;
 		return meshes.toArray(Mesh.class);
 	}
@@ -736,13 +734,5 @@ public class VoxelVisualizer{
 		p.z = p1.z + mu * (p2.z - p1.z);
 
 		return (p);
-	}
-
-	static private void printf(String string, Object...args){
-		System.out.printf(string, args);
-	}
-
-	static private void print(String string){
-		System.out.println(string);
 	}
 }

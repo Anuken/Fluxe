@@ -58,7 +58,8 @@ public class FluxeRenderer implements Disposable{
 		cam = new OrthographicCamera(swidth(), sheight());
 		((OrthographicCamera)cam).zoom = 0.27f;
 	}
-	/**Renders a fluxe object with the specified parameters.*/
+	
+	/**Renders a fluxe object. Needs openGL context.*/
 	public Pixmap render(Fluxor flux){
 		int size = flux.size;
 		int[][][] voxels = flux.generator.generate(size);
@@ -150,7 +151,7 @@ public class FluxeRenderer implements Disposable{
 		return out;
 	}
 	
-	/**Uses a temporary fluxe object.*/
+	/**Uses a temporary fluxe object to render.*/
 	public Pixmap render(int size, float zoom, FluxeGenerator generator, FluxeFilter filter, boolean shadows, boolean oil){
 		tempFlux.filter = filter;
 		tempFlux.size = size;

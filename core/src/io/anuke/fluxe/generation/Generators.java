@@ -23,7 +23,7 @@ public enum Generators implements FluxeGenerator{
 			disc(size / 2, 2, size / 2, 4, bark);
 		}
 	};
-	static final int bark = Color.valueOf("FF000").toIntBits();
+	static final int bark = Color.valueOf("FF0000").toIntBits();
 	static final int leaves = Color.valueOf("00FF00").toIntBits();
 	protected int[][][] voxels;
 	protected int size, center;

@@ -2,23 +2,34 @@ package io.anuke.fluxe.modules;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 
 import io.anuke.fluxe.Fluxe;
-import io.anuke.fluxe.generation.DefaultFilter;
+import io.anuke.fluxe.generation.Filters;
+import io.anuke.fluxe.generation.Filters.ColorModFilter;
+import io.anuke.fluxe.generation.Filters.OutlineFilter;
+import io.anuke.fluxe.generation.Filters.RampColorFilter;
 import io.anuke.fluxe.generation.FluxeRenderer;
 import io.anuke.fluxe.generation.Fluxor;
-import io.anuke.fluxe.generation.TreeGenerator;
+import io.anuke.fluxe.generation.Generators;
 import io.anuke.ucore.graphics.PixmapUtils;
 import io.anuke.ucore.modules.Module;
 
 public class Controller extends Module<Fluxe>{
 	FluxeRenderer crux = new FluxeRenderer();
-	Fluxor flux = new Fluxor(new TreeGenerator(), new DefaultFilter());;
+	Fluxor flux = new Fluxor(Generators.pinetree, 
+			Filters.sequence(
+					new ColorModFilter(
+							new RampColorFilter(Color.FOREST, Color.BROWN)
+					), 
+					new OutlineFilter())
+			);
 	SpriteBatch batch = new SpriteBatch();
 	Texture lastTexture;
 	Pixmap lastPixmap;
@@ -35,6 +46,8 @@ public class Controller extends Module<Fluxe>{
 				lastPixmap.dispose();
 				lastTexture.dispose();
 			}
+			
+			flux.size = MathUtils.random(10, 59);
 			Pixmap pixmap = crux.render(flux);
 			
 			

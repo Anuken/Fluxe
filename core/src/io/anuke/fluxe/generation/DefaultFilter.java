@@ -78,13 +78,9 @@ public class DefaultFilter implements FluxeFilter{
 				
 
 				for(Color c : colors){
-					// float rd = c.r /color.r;
-					// float gd = c.g /color.g;
-					// float bd = c.b /color.b;
 
 					float max1 = Math.max(Math.max(c.r, c.g), c.b);
 					float max2 = Math.max(Math.max(color.r, color.g), color.b);
-					// float delta = 0.15f;
 
 					float dif = abs(c.r / max1 - color.r / max2) + abs(c.g / max1 - color.g / max2)
 							+ abs(c.b / max1 - color.b / max2);

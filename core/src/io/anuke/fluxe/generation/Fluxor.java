@@ -1,22 +1,14 @@
 package io.anuke.fluxe.generation;
 
-import io.anuke.ucore.ValueMap;
-
 public class Fluxor{
+	public int size= 50, pixelscale = 10;
+	public boolean oilShader, shadows;
 	private Voxelizer generator;
 	private Rasterizer filter;
-	private ValueMap values;
 	
 	public Fluxor(Voxelizer generator, Rasterizer filter){
 		this.generator = generator;
 		this.filter = filter;
-		values = new ValueMap();
-		values.put("pixelscale", 10);
-		values.put("size", 50);
-	}
-	
-	public ValueMap getValues(){
-		return values;
 	}
 	
 	public Voxelizer getVoxelizer(){
@@ -36,6 +28,6 @@ public class Fluxor{
 	}
 	
 	public int[][][] generate(){
-		return generator.generate(values.getInt("size"));
+		return generator.generate(size);
 	}
 }

@@ -17,6 +17,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
@@ -62,7 +63,8 @@ public class Crux implements Disposable{
 	}
 
 	public Pixmap render(Fluxor flux){
-		int size = flux.getValues().getInt("size");
+		flux.size =  MathUtils.random(30, 59);
+		int size = flux.size;
 		int[][][] voxels = flux.generate();
 		
 		cam.position.set(size * 4+20, size * 2+50, size * 4+20);
@@ -81,7 +83,7 @@ public class Crux implements Disposable{
 		minstance.transform.scale(scale, scale, scale);
 		
 
-		if(flux.getValues().getBoolean("shadows")){
+		if(flux.shadows){
 			shadowLight.begin(Vector3.Zero, cam.direction);
 			shadowBatch.begin(shadowLight.getCamera());
 			Gdx.gl.glClearColor(0, 0, 0, 0);
@@ -110,7 +112,7 @@ public class Crux implements Disposable{
 
 		buffers.end("pixel");
 
-		batch.setShader(flux.getValues().getBoolean("oil") ? shader : null);
+		batch.setShader(flux.oilShader ? shader : null);
 		batch.begin();
 
 		batch.draw(buffers.texture("pixel"), 0, sheight(), swidth(), -sheight());

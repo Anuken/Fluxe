@@ -13,7 +13,6 @@ import io.anuke.fluxe.generation.Crux;
 import io.anuke.fluxe.generation.DefaultRasterizer;
 import io.anuke.fluxe.generation.Fluxor;
 import io.anuke.fluxe.generation.TreeVoxelizer;
-import io.anuke.ucore.UCore;
 import io.anuke.ucore.graphics.PixmapUtils;
 import io.anuke.ucore.modules.Module;
 
@@ -23,7 +22,7 @@ public class Controller extends Module<Fluxe>{
 	SpriteBatch batch = new SpriteBatch();
 	Texture lastTexture;
 	Pixmap lastPixmap;
-	{UCore.maximizeWindow();}
+	//{UCore.maximizeWindow();}
 
 	@Override
 	public void update(){

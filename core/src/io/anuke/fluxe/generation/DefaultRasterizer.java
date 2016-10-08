@@ -32,12 +32,13 @@ public class DefaultRasterizer implements Rasterizer{
 	}
 
 	public Pixmap process(Pixmap input){
+
 		Color color = new Color();
 
 		Pixmap pixmap = new Pixmap(input.getWidth(), input.getHeight(), Format.RGBA8888);
 
 		int blank = Color.rgba8888(0, 0, 0, 0);
-
+		
 		for(int x = 0; x < input.getWidth(); x++){
 			for(int y = 0; y < input.getHeight(); y++){
 				int i = input.getPixel(x, y);
@@ -74,6 +75,7 @@ public class DefaultRasterizer implements Rasterizer{
 				float md = 3f;
 				float shade = 0f;
 				Color closest = null;
+				
 
 				for(Color c : colors){
 					// float rd = c.r /color.r;
@@ -86,19 +88,24 @@ public class DefaultRasterizer implements Rasterizer{
 
 					float dif = abs(c.r / max1 - color.r / max2) + abs(c.g / max1 - color.g / max2)
 							+ abs(c.b / max1 - color.b / max2);
-
+					
 					if(dif < md){
 						closest = c.cpy();
 						md = dif;
 						shade = (int) (1f / (((c.r / color.r + c.g / color.g + c.b / color.b) / 3f) + Noise.normalNoise(x, y, 3f, 0.2f)) / 0.2f) * 0.2f;
+						
+						if(shade < 0.4f) shade = 0.4f;
 					}
 				}
-
+				
+				
+				shade += 0.1f;
 				pixmap.setColor(closest.mul(shade*1.1f, shade*1.1f, (shade)*1.1f, 1f));
 				pixmap.drawPixel(x, y);
 			}
+			
 		}
-
+	
 		for(int x = 0; x < input.getWidth(); x++){
 			for(int y = 0; y < input.getHeight(); y++){
 				input.drawPixel(x, y, pixmap.getPixel(x, y));

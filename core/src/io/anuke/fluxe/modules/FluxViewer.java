@@ -24,7 +24,6 @@ import com.badlogic.gdx.graphics.g3d.shaders.DepthShader;
 import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -91,7 +90,7 @@ public class FluxViewer extends Module<Fluxe>{
 
 		flux = new Fluxor(new TreeVoxelizer(), new DefaultRasterizer());
 
-		int size = flux.getValues().getInt("size");
+		int size = flux.size;
 
 		cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
@@ -191,7 +190,7 @@ public class FluxViewer extends Module<Fluxe>{
 		}
 
 		//camController.update();
-
+/*
 		if(shadows){
 			shadowLight.begin(Vector3.Zero, cam.direction);
 			shadowBatch.begin(shadowLight.getCamera());
@@ -206,7 +205,9 @@ public class FluxViewer extends Module<Fluxe>{
 			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 			shadowLight.end();
 		}
-
+*/
+		
+		
 		if(pixelate) Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth() / pixelscale, Gdx.graphics.getHeight() / pixelscale);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
@@ -253,6 +254,7 @@ public class FluxViewer extends Module<Fluxe>{
 			texture.dispose();
 			pixmap.dispose();
 		}
+		
 
 	}
 

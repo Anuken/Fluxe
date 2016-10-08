@@ -15,9 +15,7 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight;
-import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
@@ -28,22 +26,21 @@ import io.anuke.ucore.graphics.FrameBufferMap;
 import io.anuke.ucore.graphics.PixmapUtils;
 
 @SuppressWarnings("deprecation")
-public class Crux implements Disposable{
-	public Environment environment;
-	public Camera cam;
-	public ModelBatch modelBatch, shadowBatch;
-	public SpriteBatch batch;
-	public FirstPersonCameraController camController;
-	public FrameBufferMap buffers = new FrameBufferMap();
-	public DirectionalShadowLight shadowLight;
-	public int vwidth = 104, vheight = 200;
-	ShaderProgram shader;
-	Rasterizer filter = new DefaultRasterizer();
+public class FluxeRenderer implements Disposable{
+	private Environment environment;
+	private Camera cam;
+	private ModelBatch modelBatch, shadowBatch;
+	private SpriteBatch batch;
+	private FrameBufferMap buffers = new FrameBufferMap();
+	private DirectionalShadowLight shadowLight;
+	private int vwidth = 100, vheight = 200;
+	private ShaderProgram oilShader;
+	private Fluxor tempFlux = new Fluxor(null, null);
 
-	public Crux(){
+	public FluxeRenderer(){
 		ShaderProgram.pedantic = true;
-		shader = new ShaderProgram(Gdx.files.internal("shaders/default.vertex"), Gdx.files.internal("shaders/oilpaint.fragment"));
-		if( !shader.isCompiled()) throw new GdxRuntimeException("Couldn't compile shader: " + shader.getLog());
+		oilShader = new ShaderProgram(Gdx.files.internal("shaders/default.vertex"), Gdx.files.internal("shaders/oilpaint.fragment"));
+		if( !oilShader.isCompiled()) throw new GdxRuntimeException("Couldn't compile shader: " + oilShader.getLog());
 
 		shadowLight = new DirectionalShadowLight(1440 * 10, 900 * 10, 400f, 400f, 1f, 300f);
 
@@ -61,11 +58,10 @@ public class Crux implements Disposable{
 		cam = new OrthographicCamera(swidth(), sheight());
 		((OrthographicCamera)cam).zoom = 0.27f;
 	}
-
+	/**Renders a fluxe object with the specified parameters.*/
 	public Pixmap render(Fluxor flux){
-		flux.size =  MathUtils.random(30, 59);
 		int size = flux.size;
-		int[][][] voxels = flux.generate();
+		int[][][] voxels = flux.generator.generate(size);
 		
 		cam.position.set(size * 4+20, size * 2+50, size * 4+20);
 		cam.lookAt(size * 2, size * 2, size * 2);
@@ -77,8 +73,7 @@ public class Crux implements Disposable{
 		
 		Model model = VoxelVisualizer.generateVoxelModel(voxels);
 		ModelInstance minstance = new ModelInstance(model);
-		float zoom = 0.15f;
-		float scale = 4f*zoom;
+		float scale = 4f*flux.zoom;
 		minstance.transform.setToTranslation(0, size, 0);
 		minstance.transform.scale(scale, scale, scale);
 		
@@ -112,7 +107,7 @@ public class Crux implements Disposable{
 
 		buffers.end("pixel");
 
-		batch.setShader(flux.oilShader ? shader : null);
+		batch.setShader(flux.oilShader ? oilShader : null);
 		batch.begin();
 
 		batch.draw(buffers.texture("pixel"), 0, sheight(), swidth(), -sheight());
@@ -147,12 +142,23 @@ public class Crux implements Disposable{
 		pixmap = cropped;
 		flip(pixmap);
 
-		Pixmap out = flux.getRasterizer().process(pixmap);
+		Pixmap out = flux.filter.process(pixmap);
 		pixmap.dispose();
 		
 		model.dispose();
 		
 		return out;
+	}
+	
+	/**Uses a temporary fluxe object.*/
+	public Pixmap render(int size, float zoom, FluxeGenerator generator, FluxeFilter filter, boolean shadows, boolean oil){
+		tempFlux.filter = filter;
+		tempFlux.size = size;
+		tempFlux.zoom = zoom;
+		tempFlux.generator = generator;
+		tempFlux.shadows = shadows;
+		tempFlux.oilShader = oil;
+		return render(tempFlux);
 	}
 	
 	void flip(Pixmap pixmap){
@@ -188,7 +194,7 @@ public class Crux implements Disposable{
 		batch.dispose();
 		modelBatch.dispose();
 		shadowBatch.dispose();
-		shader.dispose();
+		oilShader.dispose();
 		buffers.dispose();
 	}
 }

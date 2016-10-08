@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import io.anuke.ucore.UCore;
 
-public class TreeVoxelizer implements Voxelizer{
+public class TreeGenerator implements FluxeGenerator{
 	static int bark = Color.valueOf("965f18").toIntBits();
 	static int leaves = Color.valueOf("439432").toIntBits();
 	int[][][] write;
@@ -28,15 +28,34 @@ public class TreeVoxelizer implements Voxelizer{
 
 	void generate(){
 		int trunk = size / 5;
-
+		int px=0, pz=0;
+		
 		for(int y = trunk; y < size - 4; y++){
-			ndisc(size / 2, y, size / 2, (size - 5 - y) / 4 + (y % 2) * 2 + 1, leaves);
+			//if(MathUtils.randomBoolean())
+			//	px += MathUtils.random(-1, 1);
+			
+			//if(MathUtils.randomBoolean())
+			//	pz += MathUtils.random(-1, 1);
+			
+			ndisc(size / 2+px, y, size / 2+pz, (size - 5 - y) / 4 + (y % 3) + 1, leaves);
+			/*
+			if(y % 3 == 1)
+				disc2(size / 2+px, y, size / 2+pz, (size - 5 - y) / 4 + (y % 2) * 2 + 1, leaves);
+			else if(y < size*0.7f)
+				ndisc(size / 2+px, y, size / 2+pz, (size - 5 - y) / 10 + 3, leaves);
+			else if(y != size-5)
+				ndisc(size / 2+px, y, size / 2+pz, 2, leaves);
+			else
+				ndisc(size / 2+px, y, size / 2+pz, 1, leaves);
+				*/
 		}
+		
+		ndisc(size / 2+px, size-4, size / 2+pz, 2, leaves);
 
-		ndisc(size / 2, size - 3 - 1, size / 2, 1, leaves);
+		//ndisc(size / 2, size - 3 - 1, size / 2, 1, leaves);
 
 		for(int y = 2; y < trunk; y++){
-			ndisc(size / 2, y, size / 2, (trunk + 2 - y) / 3 + 1, bark);
+			ndisc(size / 2, y, size / 2, (trunk + 2 - y) / 3+1, bark);
 		}
 
 		ndisc(size / 2, 2, size / 2, 4, bark);
@@ -102,6 +121,7 @@ public class TreeVoxelizer implements Voxelizer{
 			}
 		}
 	}
+	
 
 	void disc3(int px, int py, int pz, int rad, int type){
 		int brad = rad;
@@ -110,9 +130,9 @@ public class TreeVoxelizer implements Voxelizer{
 		for(int x = 0; x < voxels.length; x++){
 			for(int z = 0; z < voxels[x][py].length; z++){
 				vector.set(z - pz, x - px);
-				float angle = (vector.angle() + off) / 10;
+				float angle = (vector.angle()+off) / 10;
 
-				rad = brad + (int) (Math.sin(angle) * 1.3f);
+				rad = brad + (int) (Math.sin(angle) * 2f);
 
 				if(Vector2.dst(px, pz, x, z) < rad)
 					place(x, py, z, type);

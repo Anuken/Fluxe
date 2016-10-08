@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 
 import io.anuke.ucore.Noise;
 
-public class DefaultRasterizer implements Rasterizer{
+public class DefaultFilter implements FluxeFilter{
 
 	Color[] ramp = { hex("4e9449"), hex("3e723a"), hex("2e532b"), hex("254223"), hex("172916"), hex("965f18"),
 			hex("7c4f15"), hex("613e10"), hex("462d0c"), hex("38240b") };
@@ -92,15 +92,15 @@ public class DefaultRasterizer implements Rasterizer{
 					if(dif < md){
 						closest = c.cpy();
 						md = dif;
-						shade = (int) (1f / (((c.r / color.r + c.g / color.g + c.b / color.b) / 3f) + Noise.normalNoise(x, y, 3f, 0.2f)) / 0.2f) * 0.2f;
+						shade = (int) (1f / (((c.r / color.r + c.g / color.g + c.b / color.b) / 3f) + Noise.normalNoise(x, y, 3f, 0.2f)) / 0.2f + dither(x,y)/2.5f) * 0.2f;
 						
 						if(shade < 0.4f) shade = 0.4f;
 					}
 				}
 				
 				
-				shade += 0.1f;
-				pixmap.setColor(closest.mul(shade*1.1f, shade*1.1f, (shade)*1.1f, 1f));
+				shade += 0.05f;
+				pixmap.setColor(closest.mul(shade, shade, (shade), 1f));
 				pixmap.drawPixel(x, y);
 			}
 			
@@ -121,6 +121,10 @@ public class DefaultRasterizer implements Rasterizer{
 		 * }
 		 */
 		return pixmap;
+	}
+	
+	float dither(int x, int y){
+		return ((x+y)%2);
 	}
 
 	Color hex(String s){

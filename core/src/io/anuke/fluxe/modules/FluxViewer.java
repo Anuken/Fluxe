@@ -29,11 +29,11 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import io.anuke.fluxe.Fluxe;
-import io.anuke.fluxe.generation.Crux;
-import io.anuke.fluxe.generation.DefaultRasterizer;
+import io.anuke.fluxe.generation.DefaultFilter;
+import io.anuke.fluxe.generation.FluxeFilter;
+import io.anuke.fluxe.generation.FluxeRenderer;
 import io.anuke.fluxe.generation.Fluxor;
-import io.anuke.fluxe.generation.Rasterizer;
-import io.anuke.fluxe.generation.TreeVoxelizer;
+import io.anuke.fluxe.generation.TreeGenerator;
 import io.anuke.fluxe.meshes.VoxelVisualizer;
 import io.anuke.ucore.graphics.FrameBufferMap;
 import io.anuke.ucore.graphics.PixmapUtils;
@@ -56,8 +56,8 @@ public class FluxViewer extends Module<Fluxe>{
 	ShaderProgram shader;
 	Fluxor flux;
 	int[][][] voxels;
-	Rasterizer filter = new DefaultRasterizer();
-	Crux crux = new Crux();
+	FluxeFilter filter = new DefaultFilter();
+	FluxeRenderer crux = new FluxeRenderer();
 
 	public FluxViewer(){
 		ShaderProgram.pedantic = true;
@@ -88,7 +88,7 @@ public class FluxViewer extends Module<Fluxe>{
 
 		//cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-		flux = new Fluxor(new TreeVoxelizer(), new DefaultRasterizer());
+		flux = new Fluxor(new TreeGenerator(), new DefaultFilter());
 
 		int size = flux.size;
 
@@ -103,7 +103,7 @@ public class FluxViewer extends Module<Fluxe>{
 
 		//camController = new FirstPersonCameraController(cam);
 
-		voxels = flux.generate();
+		voxels = flux.generateVoxels();
 
 		/*
 		for(int x = 0;x < voxels.length;x ++){
@@ -177,7 +177,7 @@ public class FluxViewer extends Module<Fluxe>{
 		}
 
 		if(Gdx.input.isKeyJustPressed(Keys.R)){
-			voxels = flux.generate();
+			voxels = flux.generateVoxels();
 
 			for(Model model : models)
 				model.dispose();

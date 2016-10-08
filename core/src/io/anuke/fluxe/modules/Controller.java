@@ -9,16 +9,16 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import io.anuke.fluxe.Fluxe;
-import io.anuke.fluxe.generation.Crux;
-import io.anuke.fluxe.generation.DefaultRasterizer;
+import io.anuke.fluxe.generation.DefaultFilter;
+import io.anuke.fluxe.generation.FluxeRenderer;
 import io.anuke.fluxe.generation.Fluxor;
-import io.anuke.fluxe.generation.TreeVoxelizer;
+import io.anuke.fluxe.generation.TreeGenerator;
 import io.anuke.ucore.graphics.PixmapUtils;
 import io.anuke.ucore.modules.Module;
 
 public class Controller extends Module<Fluxe>{
-	Crux crux = new Crux();
-	Fluxor flux = new Fluxor(new TreeVoxelizer(), new DefaultRasterizer());;
+	FluxeRenderer crux = new FluxeRenderer();
+	Fluxor flux = new Fluxor(new TreeGenerator(), new DefaultFilter());;
 	SpriteBatch batch = new SpriteBatch();
 	Texture lastTexture;
 	Pixmap lastPixmap;

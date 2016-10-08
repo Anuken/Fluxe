@@ -140,7 +140,7 @@ public class Crux implements Disposable{
 			}
 		}
 		
-		Pixmap cropped = PixmapUtils.crop(pixmap, minx, miny, maxx - minx, maxy - miny);
+		Pixmap cropped = PixmapUtils.crop(pixmap, minx-1, miny-1, maxx - minx+3, maxy - miny+3);
 		pixmap.dispose();
 		pixmap = cropped;
 		flip(pixmap);

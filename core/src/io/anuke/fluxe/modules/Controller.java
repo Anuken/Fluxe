@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.MathUtils;
 import io.anuke.fluxe.Fluxe;
 import io.anuke.fluxe.generation.Filters;
 import io.anuke.fluxe.generation.Filters.ColorModFilter;
+import io.anuke.fluxe.generation.Filters.DitherColorFilter;
 import io.anuke.fluxe.generation.Filters.OutlineFilter;
 import io.anuke.fluxe.generation.Filters.RampColorFilter;
 import io.anuke.fluxe.generation.FluxeRenderer;
@@ -26,8 +27,9 @@ public class Controller extends Module<Fluxe>{
 	Fluxor flux = new Fluxor(Generators.pinetree, 
 			Filters.sequence(
 					new ColorModFilter(
+							new DitherColorFilter(),
 							new RampColorFilter(Color.FOREST, Color.BROWN)
-					), 
+					),
 					new OutlineFilter())
 			);
 	SpriteBatch batch = new SpriteBatch();

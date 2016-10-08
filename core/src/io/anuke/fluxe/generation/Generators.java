@@ -11,22 +11,31 @@ public enum Generators implements FluxeGenerator{
 			int trunk = size / 5;
 			
 			for(int y = trunk; y < size - 4; y++){
-				disc(size / 2, y, size / 2, (size - 5 - y) / 4 + (y % 3) + 1, leaves);
+				disc(size / 2, y, size / 2, (size - 5 - y) / 4 + (y % 3) + 1, c(1));
 			}
 			
-			disc(size / 2, size-4, size / 2, 2, leaves);
+			disc(size / 2, size-4, size / 2, 2, c(1));
 
 			for(int y = 2; y < trunk; y++){
-				disc(size / 2, y, size / 2, (trunk + 2 - y) / 3+1, bark);
+				disc(size / 2, y, size / 2, (trunk + 2 - y) / 3+1, c(0));
 			}
 
-			disc(size / 2, 2, size / 2, 4, bark);
+			disc(size / 2, 2, size / 2, 4, c(0));
 		}
 	};
-	static final int bark = Color.valueOf("FF0000").toIntBits();
-	static final int leaves = Color.valueOf("00FF00").toIntBits();
+	static final Color[] ocolors = {
+		hex("FF0000"),		//bark
+		hex("00FF00")		//leaves
+	};
+	static final int[] colors = new int[ocolors.length];
+	
 	protected int[][][] voxels;
 	protected int size, center;
+	static{
+		for(int i = 0; i < colors.length; i ++){
+			colors[i] = ocolors[i].toIntBits();
+		}
+	}
 	
 	void generate(){}
 
@@ -54,5 +63,13 @@ public enum Generators implements FluxeGenerator{
 		if(!UCore.inBounds(x, y + 1, z, voxels.length, 1))
 			return;
 		voxels[x][y + 1][z] = color;
+	}
+	
+	int c(int i){
+		return colors[i];
+	}
+	
+	static Color hex(String s){
+		return Color.valueOf(s);
 	}
 }

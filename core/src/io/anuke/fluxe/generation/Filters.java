@@ -1,7 +1,5 @@
 package io.anuke.fluxe.generation;
 
-import static java.lang.Math.abs;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 
@@ -137,31 +135,30 @@ public class Filters implements FluxeFilter{
 		
 		@Override
 		public void modify(Color input, int x, int y){
+			int index = Hue.closest(input, Generators.ocolors);
+			Color c = Generators.ocolors[index];
+			float shade =  1f / (((c.r / (input.r+0.000001f) + c.g / (input.g+0.000001f) + c.b / (input.b+0.000001f)) / 3f));
+			shade/=3f;
+			int i2 = Hue.closest(input, colors);
+			Color r = colors[i2];
 			
-			float md = 3f;
-			float shade = 0f;
-			Color closest = new Color();
+			shade = (int)(shade/0.2f)*0.2f;
 			
-			for(Color c : colors){
-
-				float max1 = Math.max(Math.max(c.r, c.g), c.b);
-				float max2 = Math.max(Math.max(color.r, color.g), color.b);
-
-				float dif = abs(c.r / max1 - color.r / max2) + abs(c.g / max1 - color.g / max2)
-						+ abs(c.b / max1 - color.b / max2);
-				
-				if(dif < md){
-					closest.set(c);
-					md = dif;
-					System.out.println(md);
-					shade = (int) (1f / (((c.r / color.r + c.g / color.g + c.b / color.b) / 3f)) / 0.2f) * 0.2f;
-					
-					//if(shade < 0.4f) shade = 0.4f;
-				}
-			}
-			
-			closest.mul(shade, shade, shade, 1f);
-			input.set(closest);
+			input.set(r.r*shade, r.g*shade, r.b*shade, 1f);
+		}
+	}
+	
+	public static class DitherColorFilter implements ColorFilter{
+		float i = 0.1f;
+		
+		@Override
+		public void modify(Color input, int x, int y){
+			float d = dither(x,y);
+			input.mul(1+(i*d), 1+(i*d), 1+(i*d), 1f);
+		}
+		
+		float dither(int x, int y){
+			return (x+y)%2;
 		}
 	}
 }

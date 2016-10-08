@@ -6,6 +6,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -29,6 +30,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import io.anuke.fluxe.Fluxe;
+import io.anuke.fluxe.generation.ColorPalette;
 import io.anuke.fluxe.generation.DefaultFilter;
 import io.anuke.fluxe.generation.FluxeFilter;
 import io.anuke.fluxe.generation.FluxeRenderer;
@@ -88,7 +90,7 @@ public class FluxViewer extends Module<Fluxe>{
 
 		//cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-		flux = new Fluxor(new TreeGenerator(), new DefaultFilter());
+		flux = new Fluxor(new TreeGenerator(), new DefaultFilter(), new ColorPalette(Color.FOREST, Color.BROWN));
 
 		int size = flux.size;
 

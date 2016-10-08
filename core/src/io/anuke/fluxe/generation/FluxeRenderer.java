@@ -27,6 +27,7 @@ import io.anuke.ucore.graphics.PixmapUtils;
 
 @SuppressWarnings("deprecation")
 public class FluxeRenderer implements Disposable{
+	private static Fluxor current;
 	private Environment environment;
 	private Camera cam;
 	private ModelBatch modelBatch, shadowBatch;
@@ -35,7 +36,7 @@ public class FluxeRenderer implements Disposable{
 	private DirectionalShadowLight shadowLight;
 	private int vwidth = 100, vheight = 200;
 	private ShaderProgram oilShader;
-	private Fluxor tempFlux = new Fluxor(null, null);
+	private Fluxor tempFlux = new Fluxor(null, null, null);
 
 	public FluxeRenderer(){
 		ShaderProgram.pedantic = true;
@@ -61,8 +62,15 @@ public class FluxeRenderer implements Disposable{
 	
 	/**Renders a fluxe object. Needs openGL context.*/
 	public Pixmap render(Fluxor flux){
+		current = flux;
 		int size = flux.size;
 		int[][][] voxels = flux.generator.generate(size);
+		for(int x = 0; x < size; x ++)
+			for(int y = 0; y < size; y ++)
+				for(int z = 0; z < size; z ++)
+					if(voxels[x][y][z] != 0) voxels[x][y][z] = flux.palette.colors[voxels[x][y][z]-1].toIntBits();
+			
+		
 		
 		cam.position.set(size * 4+20, size * 2+50, size * 4+20);
 		cam.lookAt(size * 2, size * 2, size * 2);
@@ -147,7 +155,7 @@ public class FluxeRenderer implements Disposable{
 		pixmap.dispose();
 		
 		model.dispose();
-		
+		current = null;
 		return out;
 	}
 	
@@ -197,5 +205,9 @@ public class FluxeRenderer implements Disposable{
 		shadowBatch.dispose();
 		oilShader.dispose();
 		buffers.dispose();
+	}
+	
+	public static Fluxor getCurrentlyRenderingFluxor(){
+		return current;
 	}
 }

@@ -114,6 +114,7 @@ public class VoxelVisualizer{
 		Array<Mesh> meshes = new Array<Mesh>();
 
 		splitMeshes(meshes, newvertices, newindices);
+		
 		/*
 		printf("Mesh stats:\n");
 		printf("  %d vertices\n", (int)vertices.size);

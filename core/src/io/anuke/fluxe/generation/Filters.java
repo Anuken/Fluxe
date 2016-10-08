@@ -126,25 +126,29 @@ public class Filters implements FluxeFilter{
 		}
 	}
 	
-	public static class RampColorFilter implements ColorFilter{
-		Color[] colors;
+	/**Rounds the color shade to a certain amount.*/
+	public static class LimitColorFilter implements ColorFilter{
+		float round = 0.2f;
 		
-		public RampColorFilter(Color...colors){
-			this.colors = colors;
+		public LimitColorFilter(){
+			
+		}
+		
+		public LimitColorFilter(float i){
+			this.round = i;
 		}
 		
 		@Override
 		public void modify(Color input, int x, int y){
-			int index = Hue.closest(input, Generators.ocolors);
-			Color c = Generators.ocolors[index];
+			Color[] colors = FluxeRenderer.getCurrentlyRenderingFluxor().palette.significantColors;
+			int index = Hue.closest(input, colors);
+			Color c = colors[index];
 			float shade =  1f / (((c.r / (input.r+0.000001f) + c.g / (input.g+0.000001f) + c.b / (input.b+0.000001f)) / 3f));
-			shade/=3f;
-			int i2 = Hue.closest(input, colors);
-			Color r = colors[i2];
+
 			
-			shade = (int)(shade/0.2f)*0.2f;
+			shade = (int)(shade/round)*round;
 			
-			input.set(r.r*shade, r.g*shade, r.b*shade, 1f);
+			input.set(c.r*shade, c.g*shade, c.b*shade, 1f);
 		}
 	}
 	

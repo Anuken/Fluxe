@@ -8,10 +8,12 @@ public class Fluxor{
 	public boolean oilShader, shadows = false;
 	public FluxeGenerator generator;
 	public FluxeFilter filter;
+	public ColorPalette palette;
 	
-	public Fluxor(FluxeGenerator generator, FluxeFilter filter){
+	public Fluxor(FluxeGenerator generator, FluxeFilter filter, ColorPalette palette){
 		this.generator = generator;
 		this.filter = filter;
+		this.palette = palette;
 	}
 	
 	public int[][][] generateVoxels(){

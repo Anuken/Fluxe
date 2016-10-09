@@ -152,6 +152,7 @@ public class Filters implements FluxeFilter{
 		}
 	}
 	
+	/**Adds "dithering" in the form of a grid pattern.*/
 	public static class DitherColorFilter implements ColorFilter{
 		float i = 0.1f;
 		
@@ -163,6 +164,15 @@ public class Filters implements FluxeFilter{
 		
 		float dither(int x, int y){
 			return (x+y)%2;
+		}
+	}
+	
+	/**Shifts the hue.*/
+	public static class ShiftColorFilter implements ColorFilter{
+		
+		@Override
+		public void modify(Color input, int x, int y){
+			input.mul(1f, 1f, 1f, 1f);
 		}
 	}
 }

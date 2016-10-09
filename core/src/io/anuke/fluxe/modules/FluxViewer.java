@@ -35,7 +35,7 @@ import io.anuke.fluxe.generation.DefaultFilter;
 import io.anuke.fluxe.generation.FluxeFilter;
 import io.anuke.fluxe.generation.FluxeRenderer;
 import io.anuke.fluxe.generation.Fluxor;
-import io.anuke.fluxe.generation.TreeGenerator;
+import io.anuke.fluxe.generation.Generators;
 import io.anuke.fluxe.meshes.VoxelVisualizer;
 import io.anuke.ucore.graphics.FrameBufferMap;
 import io.anuke.ucore.graphics.PixmapUtils;
@@ -90,7 +90,7 @@ public class FluxViewer extends Module<Fluxe>{
 
 		//cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-		flux = new Fluxor(new TreeGenerator(), new DefaultFilter(), new ColorPalette(Color.FOREST, Color.BROWN));
+		flux = new Fluxor(Generators.bush, new DefaultFilter(), new ColorPalette(Color.FOREST, Color.BROWN));
 
 		int size = flux.size;
 

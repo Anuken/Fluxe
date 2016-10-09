@@ -16,6 +16,7 @@ import io.anuke.fluxe.generation.Filters.ColorModFilter;
 import io.anuke.fluxe.generation.Filters.DitherColorFilter;
 import io.anuke.fluxe.generation.Filters.LimitColorFilter;
 import io.anuke.fluxe.generation.Filters.OutlineFilter;
+import io.anuke.fluxe.generation.Filters.ShiftColorFilter;
 import io.anuke.fluxe.generation.FluxeRenderer;
 import io.anuke.fluxe.generation.Fluxor;
 import io.anuke.fluxe.generation.Generators;
@@ -24,11 +25,12 @@ import io.anuke.ucore.modules.Module;
 
 public class Controller extends Module<Fluxe>{
 	FluxeRenderer crux = new FluxeRenderer();
-	Fluxor flux = new Fluxor(Generators.pinetree, 
+	Fluxor flux = new Fluxor(Generators.bush, 
 			Filters.sequence(
 					new ColorModFilter(
 							new DitherColorFilter(),
-							new LimitColorFilter()
+							new LimitColorFilter(),
+							new ShiftColorFilter()
 					),
 					new OutlineFilter()),
 			new ColorPalette("439432", "965f18")
@@ -51,7 +53,7 @@ public class Controller extends Module<Fluxe>{
 				lastTexture.dispose();
 			}
 			
-			flux.size = MathUtils.random(10, 59);
+			flux.size = MathUtils.random(30, 59);
 			Pixmap pixmap = crux.render(flux);
 			
 			

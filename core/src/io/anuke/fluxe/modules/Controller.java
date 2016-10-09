@@ -15,6 +15,7 @@ import io.anuke.fluxe.generation.Filters;
 import io.anuke.fluxe.generation.Filters.ColorModFilter;
 import io.anuke.fluxe.generation.Filters.DitherColorFilter;
 import io.anuke.fluxe.generation.Filters.LimitColorFilter;
+import io.anuke.fluxe.generation.Filters.NoiseColorFilter;
 import io.anuke.fluxe.generation.Filters.OutlineFilter;
 import io.anuke.fluxe.generation.Filters.ShiftColorFilter;
 import io.anuke.fluxe.generation.FluxeRenderer;
@@ -25,10 +26,11 @@ import io.anuke.ucore.modules.Module;
 
 public class Controller extends Module<Fluxe>{
 	FluxeRenderer crux = new FluxeRenderer();
-	Fluxor flux = new Fluxor(Generators.bush, 
+	Fluxor flux = new Fluxor(Generators.simplepinetree, 
 			Filters.sequence(
 					new ColorModFilter(
 							new DitherColorFilter(),
+							new NoiseColorFilter(),
 							new LimitColorFilter(),
 							new ShiftColorFilter()
 					),

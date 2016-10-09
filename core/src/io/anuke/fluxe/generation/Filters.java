@@ -3,6 +3,7 @@ package io.anuke.fluxe.generation;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 
+import io.anuke.ucore.Noise;
 import io.anuke.ucore.graphics.Hue;
 import io.anuke.ucore.graphics.PixmapUtils;
 
@@ -129,6 +130,7 @@ public class Filters implements FluxeFilter{
 	/**Rounds the color shade to a certain amount.*/
 	public static class LimitColorFilter implements ColorFilter{
 		float round = 0.2f;
+		float min = 0.4f, max = 3;
 		
 		public LimitColorFilter(){
 			
@@ -147,6 +149,8 @@ public class Filters implements FluxeFilter{
 
 			
 			shade = (int)(shade/round)*round;
+			if(shade < min) shade = min;
+			if(shade > max) shade = max;
 			
 			input.set(c.r*shade, c.g*shade, c.b*shade, 1f);
 		}
@@ -163,7 +167,27 @@ public class Filters implements FluxeFilter{
 		}
 		
 		float dither(int x, int y){
-			return (x+y)%2;
+			boolean i = (x+y)%3 == 0 && (x-y)%3==0;
+			
+			return (i ? 1 : 0)+(x+y)%2;
+		}
+	}
+	
+	/**Adds noise.*/
+	public static class NoiseColorFilter implements ColorFilter{
+		float scale = 3f, mag = 0.1f;
+		
+		public NoiseColorFilter(){}
+		
+		public NoiseColorFilter(float scale, float mag){
+			this.scale = scale;
+			this.mag = mag;
+		}
+		
+		@Override
+		public void modify(Color input, int x, int y){
+			float d = Noise.normalNoise(x, y, scale, mag);
+			input.mul(1+(d), 1+(d), 1+(d), 1f);
 		}
 	}
 	

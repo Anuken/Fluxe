@@ -26,7 +26,7 @@ import io.anuke.ucore.modules.Module;
 
 public class Controller extends Module<Fluxe>{
 	FluxeRenderer crux = new FluxeRenderer();
-	Fluxor flux = new Fluxor(Generators.simplepinetree, 
+	Fluxor flux = new Fluxor(Generators.tree, 
 			Filters.sequence(
 					new ColorModFilter(
 							new DitherColorFilter(),
@@ -35,8 +35,10 @@ public class Controller extends Module<Fluxe>{
 							new ShiftColorFilter()
 					),
 					new OutlineFilter()),
-			new ColorPalette("439432", "965f18")
-	);
+			new ColorPalette("548e31", "965f18")
+	){{
+	zoom = 0.15f;	
+	}};
 	
 	SpriteBatch batch = new SpriteBatch();
 	Texture lastTexture;
@@ -55,7 +57,7 @@ public class Controller extends Module<Fluxe>{
 				lastTexture.dispose();
 			}
 			
-			flux.size = MathUtils.random(30, 59);
+			flux.size = MathUtils.random(20, 59);
 			Pixmap pixmap = crux.render(flux);
 			
 			

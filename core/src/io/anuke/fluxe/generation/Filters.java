@@ -159,6 +159,7 @@ public class Filters implements FluxeFilter{
 	/**Adds "dithering" in the form of a grid pattern.*/
 	public static class DitherColorFilter implements ColorFilter{
 		float i = 0.1f;
+		boolean multi = true;
 		
 		@Override
 		public void modify(Color input, int x, int y){
@@ -167,7 +168,7 @@ public class Filters implements FluxeFilter{
 		}
 		
 		float dither(int x, int y){
-			boolean i = (x+y)%3 == 0 && (x-y)%3==0;
+			boolean i = ((x+y)%3 == 0 && (x-y)%3==0) && multi;
 			
 			return (i ? 1 : 0)+(x+y)%2;
 		}

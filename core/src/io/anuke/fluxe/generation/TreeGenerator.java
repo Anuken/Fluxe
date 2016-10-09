@@ -60,20 +60,9 @@ public class TreeGenerator implements FluxeGenerator{
 
 		ndisc(size / 2, 2, size / 2, 4, bark);
 
-		/*
-		 * for(int y = 3;y < trunk + 1;y ++){ if(y == 3){ disc2(size / 2, y,
-		 * size / 2, 4 + (6 - y + 1) / 3, bark); }else{ disc(size / 2, y, size /
-		 * 2, 4 + (6 - y) / 3, bark); } }
-		 * 
-		 * disc2(size / 2, trunk + 1, size / 2, (voxels.length - (trunk + 1)) /
-		 * 5 - ((trunk + 1) % 3) * 2 + 3, leaves);
-		 * 
-		 * for(int y = trunk + 1;y < voxels.length - 6;y ++){ disc(size / 2, y,
-		 * size / 2, (voxels.length - y) / 5 - (y % 3) * 2 + 3, leaves); }
-		 * 
-		 * for(int y = 0;y < 4;y ++){ ndisc(size / 2, voxels.length - y - 6,
-		 * size / 2, 1.2f, leaves); }
-		 */
+		
+		
+		 
 	}
 
 	void disc(int px, int py, int pz, int rad, int type){

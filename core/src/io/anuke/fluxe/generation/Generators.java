@@ -27,48 +27,62 @@ public enum Generators implements FluxeGenerator{
 	},
 	simpletree{
 		void generate(){
-			int rad = MathUtils.random(size / 10, size / 7);
 
-			for(int y = 1; y < size - rad * 2; y++){
-				disc(size / 2, y, size / 2, 1, 1);
-				if(Math.random() < 0.4 && y % 3 == 0 && y > size / 3 && y < size - rad * 2 - 2){
-					int mx = 0;
-					int mz = 0;
-					if(Math.random() < 0.8){
+			// for(int j = 0; j < 3; j++){
+			int sz = 0, sx = 0;
+			int rad = MathUtils.random(size / 10, size / 7);
+			int h = MathUtils.random(0, size / 5);
+			for(int y = 1; y < size - rad * 2 - h; y++){
+
+				if(Math.random() < 0.5){
+					sz += MathUtils.randomSign();
+				}else if(Math.random() < 0.5)
+					sx += MathUtils.randomSign();
+
+				disc(size / 2 + sx, y, size / 2 + sz, 1, 1);
+
+				if(Math.random() < 0.7 && y % 3 == 0 && y > size / 3 && y < size - rad * 2 - 2){
+					int mx = 0, mz = 0;
+
+					if(Math.random() < 0.5){
 						mx = MathUtils.randomSign();
 					}else{
 						mz = MathUtils.randomSign();
 					}
 					int l = MathUtils.random(2, 4) + rad / 2 + (int) ((float) y / size * 4);
-					for(int i = 0; i < l; i++){
-						place(size / 2 + mz * i, y, size / 2 + mx * i, 1);
-					}
-					sphere(size / 2 + mz * l, y, size / 2 + mx * l, l / 3, 0);
-				}
-			}
-			for(int y = 1; y < 2; y++)
-				disc(size / 2, y, size / 2, 2, 1);
 
-			sphere(size / 2, size - rad - 3, size / 2, rad, 0);
+					for(int i = 0; i < l; i++){
+						place(size / 2 + mz * i + sx, y, size / 2 + mx * i + sz, 1);
+					}
+					sphere(size / 2 + mz * l + sx, y, size / 2 + mx * l + sz, l / 3, 0);
+				}
+
+				if(y == size - rad * 2 - 1 - h)
+					sphere(size / 2 + sx, size - rad - 3 - h, size / 2 + sz, rad, 0);
+			}
+			// }
+
+			for(int y = 1; y < 2; y++)
+				disc(size / 2, y, size / 2, 1.3f, 1);
 
 		}
 	},
 	pinetree{
 		void generate(){
-			int trunk = 4+size / 12;
-			
+			int trunk = 4 + size / 12;
+
 			for(int y = 3; y < trunk + 1; y++){
 				if(y == 3){
-					rdisc2(size / 2, y, size / 2, (4 + (6 - y + 1) / 3f)*size/60f, 1);
+					rdisc2(size / 2, y, size / 2, (4 + (6 - y + 1) / 3f) * size / 60f, 1);
 				}else{
-					rdisc(size / 2, y, size / 2, 4 + (6 - y) / 3f*size/60f, 1);
+					rdisc(size / 2, y, size / 2, 4 + (6 - y) / 3f * size / 60f, 1);
 				}
 			}
 
 			rdisc2(size / 2, trunk + 1, size / 2, (voxels.length - (trunk + 1)) / 5 - ((trunk + 1) % 3) * 2 + 3, 0);
 
 			for(int y = trunk + 1; y < voxels.length - 6; y++){
-				rdisc(size / 2, y, size / 2, (voxels.length - y) / 5 - (y % 3) * 2 + 3, 0);
+				rdiscn(size / 2, y, size / 2, (voxels.length - y) / 5 - (y % 3) * 2 + 3, 0);
 			}
 
 			for(int y = 0; y < 4; y++){
@@ -78,35 +92,37 @@ public enum Generators implements FluxeGenerator{
 	},
 	tree{
 		void generate(){
-			int trunk = 1+size / 12;
-			
-			int rad = 4+size/5;
-			
-			for(int y = 2; y < trunk+1; y++){
+			int trunk = 1 + size / 12;
+
+			int rad = 4 + size / 5;
+
+			for(int y = 2; y < trunk + 1; y++){
 				if(y == 2){
-					rdisc2(size / 2, y, size / 2, (4 + (6 - (y) + 1) / 3f)*size/60f, 1);
+					rdisc2(size / 2, y, size / 2, (4 + (6 - (y) + 1) / 3f) * size / 60f, 1);
 				}else{
-					rdisc(size / 2, y, size / 2, 4 + (6 - y) / 3f*size/60f, 1);
+					rdisc(size / 2, y, size / 2, 4 + (6 - y) / 3f * size / 60f, 1);
 				}
 			}
-			
-			
-			for(int y = trunk + 1; y < size - 1 - rad*2; y++){
-				rdisc(size/2, y, size/2, 1 + (6 - y/8) / 3f*size/60f, 1);
-			}
-			
-			for(int y = size - 2 - rad*2; y < size-2; y ++){
-				rdisc(size / 2, y, size / 2, (float)Math.sin((y-(size - 2 - rad*2))/(size/6f))*(size/6f) + (y%3)*2, 0);
+
+			for(int y = trunk + 1; y < size - 1 - rad * 2; y++){
+				rdisc(size / 2, y, size / 2, 1 + (6 - y / 8) / 3f * size / 60f, 1);
 			}
 
-			//rdisc2(size / 2, trunk + 1, size / 2, (voxels.length - (trunk + 1)) / 5 - ((trunk + 1) % 3) * 2 + 3, 0);
+			for(int y = size - 2 - rad * 2; y < size - 2; y++){
+				rdisc(size / 2, y, size / 2,
+						(float) Math.sin((y - (size - 2 - rad * 2)) / (size / 6f)) * (size / 6f) + (y % 3) * 2, 0);
+			}
+
+			// rdisc2(size / 2, trunk + 1, size / 2, (voxels.length - (trunk +
+			// 1)) / 5 - ((trunk + 1) % 3) * 2 + 3, 0);
 
 			for(int y = trunk + 1; y < voxels.length - 6; y++){
-			//	rdisc(size / 2, y, size / 2, (voxels.length - y) / 5 - (y % 3) * 2 + 3, 0);
+				// rdisc(size / 2, y, size / 2, (voxels.length - y) / 5 - (y %
+				// 3) * 2 + 3, 0);
 			}
 
 			for(int y = 0; y < 4; y++){
-			//	disc(size / 2, voxels.length - y - 6, size / 2, 1.2f, 0);
+				// disc(size / 2, voxels.length - y - 6, size / 2, 1.2f, 0);
 			}
 		}
 	},
@@ -170,7 +186,28 @@ public enum Generators implements FluxeGenerator{
 			}
 		}
 	}
-	
+
+	void rdiscn(int px, int py, int pz, float rad, int type){
+		float brad = rad;
+		Vector2 vector = new Vector2();
+		float off = MathUtils.random() * 180;
+		for(int x = 0; x < size; x++){
+			for(int z = 0; z < size; z++){
+				vector.set(z - pz, x - px);
+				float angle = (vector.angle() + off) / 10;
+
+				rad = brad + (int) (Math.sin(angle) * 1.5f);
+				if(rad - brad > 0){
+					if(Vector2.dst(px, pz, x, z) < rad)
+						place(x, py - 1, z, type);
+				}else{
+					if(Vector2.dst(px, pz, x, z) < rad)
+						place(x, py, z, type);
+				}
+			}
+		}
+	}
+
 	void rdisc(int px, int py, int pz, float rad, int type){
 		float brad = rad;
 		Vector2 vector = new Vector2();
@@ -207,7 +244,7 @@ public enum Generators implements FluxeGenerator{
 
 				if(rad - brad > 0){
 					if(Vector2.dst(px, pz, x, z) < rad)
-						place(x, py - (int)(rad - brad), z, type);
+						place(x, py - (int) (rad - brad), z, type);
 				}else{
 					if(Vector2.dst(px, pz, x, z) < rad)
 						place(x, py, z, type);

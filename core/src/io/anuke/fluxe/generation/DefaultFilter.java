@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 
-import io.anuke.ucore.Noise;
+import io.anuke.ucore.noise.Noise;
 
 public class DefaultFilter implements FluxeFilter{
 

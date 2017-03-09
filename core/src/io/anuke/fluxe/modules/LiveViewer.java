@@ -5,20 +5,10 @@ import java.nio.ByteBuffer;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.Pixmap.Format;
-import com.badlogic.gdx.graphics.PixmapIO;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight;
 import com.badlogic.gdx.graphics.g3d.shaders.DepthShader;
@@ -30,19 +20,15 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import io.anuke.fluxe.Fluxe;
-import io.anuke.fluxe.generation.ColorPalette;
-import io.anuke.fluxe.generation.DefaultFilter;
-import io.anuke.fluxe.generation.FluxeFilter;
-import io.anuke.fluxe.generation.FluxeRenderer;
-import io.anuke.fluxe.generation.Fluxor;
-import io.anuke.fluxe.generation.Generators;
+import io.anuke.fluxe.generation.*;
 import io.anuke.fluxe.meshes.VoxelVisualizer;
 import io.anuke.ucore.graphics.FrameBufferMap;
 import io.anuke.ucore.graphics.PixmapUtils;
 import io.anuke.ucore.modules.Module;
 
+/**Currently not used.*/
 @SuppressWarnings("deprecation")
-public class FluxViewer extends Module<Fluxe>{
+public class LiveViewer extends Module<Fluxe>{
 	public Environment environment;
 	public Camera cam;
 	public ModelBatch modelBatch, shadowBatch;
@@ -56,12 +42,12 @@ public class FluxViewer extends Module<Fluxe>{
 	public Array<ModelInstance> modelInstances = new Array<ModelInstance>();
 	public boolean shadows = true, oil = true;
 	ShaderProgram shader;
-	Fluxor flux;
+	FluxePattern flux;
 	int[][][] voxels;
 	FluxeFilter filter = new DefaultFilter();
 	FluxeRenderer crux = new FluxeRenderer();
 
-	public FluxViewer(){
+	public LiveViewer(){
 		ShaderProgram.pedantic = true;
 		shader = new ShaderProgram(Gdx.files.internal("shaders/default.vertex"), Gdx.files.internal("shaders/oilpaint.fragment"));
 		if( !shader.isCompiled()) throw new GdxRuntimeException("Couldn't compile shader: " + shader.getLog());
@@ -90,7 +76,7 @@ public class FluxViewer extends Module<Fluxe>{
 
 		//cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-		flux = new Fluxor(Generators.bush, new DefaultFilter(), new ColorPalette(Color.FOREST, Color.BROWN));
+		flux = new FluxePattern(Generators.bush, new DefaultFilter(), new ColorPalette(Color.FOREST, Color.BROWN));
 
 		int size = flux.size;
 

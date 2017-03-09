@@ -88,7 +88,7 @@ public class DefaultFilter implements FluxeFilter{
 					if(dif < md){
 						closest = c.cpy();
 						md = dif;
-						shade = (int) (1f / (((c.r / color.r + c.g / color.g + c.b / color.b) / 3f) + Noise.normalNoise(x, y, 3f, 0.2f)) / 0.2f + dither(x,y)/2.5f) * 0.2f;
+						shade = (int) (1f / (((c.r / color.r + c.g / color.g + c.b / color.b) / 3f) + Noise.snoise(x, y, 3f, 0.2f)) / 0.2f + dither(x,y)/2.5f) * 0.2f;
 						
 						if(shade < 0.4f) shade = 0.4f;
 					}

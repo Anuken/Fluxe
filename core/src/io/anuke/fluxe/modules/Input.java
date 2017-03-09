@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.IntIntMap;
 import io.anuke.fluxe.Fluxe;
 import io.anuke.ucore.modules.Module;
 
+/**Unused.*/
 public class Input extends Module<Fluxe> implements InputProcessor{
 	private final IntIntMap keys = new IntIntMap();
 	private int STRAFE_LEFT = Keys.A;
@@ -34,7 +35,7 @@ public class Input extends Module<Fluxe> implements InputProcessor{
 			
 		}
 		
-		camera = getModule(FluxViewer.class).cam;
+		camera = getModule(LiveViewer.class).cam;
 		if(keys.containsKey(FORWARD)){
 			if(camera instanceof OrthographicCamera){
 				((OrthographicCamera)camera).zoom -= 1 / 80f;
@@ -73,7 +74,7 @@ public class Input extends Module<Fluxe> implements InputProcessor{
 	}
 
 	public void init(){
-		camera = getModule(FluxViewer.class).cam;
+		camera = getModule(LiveViewer.class).cam;
 	}
 
 	@Override

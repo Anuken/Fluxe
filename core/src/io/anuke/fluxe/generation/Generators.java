@@ -109,8 +109,7 @@ public enum Generators implements FluxeGenerator{
 			}
 
 			for(int y = size - 2 - rad * 2; y < size - 2; y++){
-				rdisc(size / 2, y, size / 2,
-						(float) Math.sin((y - (size - 2 - rad * 2)) / (size / 6f)) * (size / 6f) + (y % 3) * 2, 0);
+				rdisc(size / 2, y, size / 2, (float) Math.sin((y - (size - 2 - rad * 2)) / (size / 6f)) * (size / 6f) + (y % 3) * 2, 0);
 			}
 
 			// rdisc2(size / 2, trunk + 1, size / 2, (voxels.length - (trunk +
@@ -142,8 +141,7 @@ public enum Generators implements FluxeGenerator{
 			int d = 2;
 
 			for(int i = 0; i < max; i++)
-				sphere(size / 2 + MathUtils.random(-d, d), trunk, size / 2 + MathUtils.random(-d, d),
-						rad + MathUtils.random(-2, 0), 0);
+				sphere(size / 2 + MathUtils.random(-d, d), trunk, size / 2 + MathUtils.random(-d, d), rad + MathUtils.random(-2, 0), 0);
 		}
 	},
 	grass{
@@ -151,8 +149,7 @@ public enum Generators implements FluxeGenerator{
 
 			for(int x = 0; x < size; x++){
 				for(int z = 0; z < size; z++){
-					if(Vector2.dst(size / 2, size / 2, x, z) < 8 && Math.random() < 0.5 && (x + z) % 3 == 0
-							&& (x - z) % 3 == 0){
+					if(Vector2.dst(size / 2, size / 2, x, z) < 8 && Math.random() < 0.5 && (x + z) % 3 == 0 && (x - z) % 3 == 0){
 						int rand = MathUtils.random(0, 15);
 						for(int i = 0; i < rand; i++)
 							place(x, i, z, 0);
@@ -160,6 +157,19 @@ public enum Generators implements FluxeGenerator{
 				}
 			}
 
+		}
+	},
+	flower{
+		void generate(){
+			for(int x = 0; x < size; x++){
+				for(int y = 0; y < size; y++){
+					for(int z = 0; z < size; z++){
+						if(Vector3.dst(x, y, z, size/2, size/2, size/2)< size/4){
+							place(x, y, z, 0);
+						}
+					}
+				}
+			}
 		}
 	};
 

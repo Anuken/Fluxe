@@ -3,16 +3,10 @@ package io.anuke.fluxe.generation;
 import java.nio.ByteBuffer;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -25,18 +19,20 @@ import io.anuke.fluxe.meshes.VoxelVisualizer;
 import io.anuke.ucore.graphics.FrameBufferMap;
 import io.anuke.ucore.graphics.PixmapUtils;
 
+/**Renders FluxePatterns.*/
 @SuppressWarnings("deprecation")
 public class FluxeRenderer implements Disposable{
-	private static Fluxor current;
+	private static FluxePattern current;
 	private Environment environment;
 	private Camera cam;
 	private ModelBatch modelBatch, shadowBatch;
 	private SpriteBatch batch;
 	private FrameBufferMap buffers = new FrameBufferMap();
 	private DirectionalShadowLight shadowLight;
-	private int vwidth = 100, vheight = 200;
+	private int vwidth = 200, vheight = 400;
 	private ShaderProgram oilShader;
-	private Fluxor tempFlux = new Fluxor(null, null, null);
+	private FluxePattern tempFlux = new FluxePattern(null, null, null);
+	private float incline = 70, distance = 20;
 
 	public FluxeRenderer(){
 		ShaderProgram.pedantic = true;
@@ -56,12 +52,25 @@ public class FluxeRenderer implements Disposable{
 		shadowBatch = new ModelBatch();
 		batch = new SpriteBatch();
 
-		cam = new OrthographicCamera(swidth(), sheight());
+		cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		((OrthographicCamera)cam).zoom = 0.27f;
 	}
 	
+	public void setImageSize(int w, int h){
+		vwidth = w;
+		vheight = h;
+	}
+	
+	public void setIncline(float i){
+		incline = i;
+	}
+	
+	public void setDistance(float d){
+		distance = d;
+	}
+	
 	/**Renders a fluxe object. Needs openGL context.*/
-	public Pixmap render(Fluxor flux){
+	public Pixmap render(FluxePattern flux){
 		current = flux;
 		int size = flux.size;
 		int[][][] voxels = flux.generator.generate(size);
@@ -71,8 +80,7 @@ public class FluxeRenderer implements Disposable{
 					if(voxels[x][y][z] != 0) voxels[x][y][z] = flux.palette.colors[voxels[x][y][z]-1].toIntBits();
 			
 		
-		
-		cam.position.set(size * 4+20, size * 2+50, size * 4+20);
+		cam.position.set(size * 4+distance, size * 2+incline, size * 4+distance);
 		cam.lookAt(size * 2, size * 2, size * 2);
 		
 		cam.near = 1f;
@@ -170,7 +178,7 @@ public class FluxeRenderer implements Disposable{
 		return render(tempFlux);
 	}
 	
-	void flip(Pixmap pixmap){
+	private void flip(Pixmap pixmap){
 		 ByteBuffer pixels = pixmap.getPixels();
          int numBytes = pixmap.getWidth() * pixmap.getHeight() * 4;
          byte[] lines = new byte[numBytes];
@@ -183,11 +191,11 @@ public class FluxeRenderer implements Disposable{
          pixels.put(lines);
 	}
 	
-	public int swidth(){
+	private int swidth(){
 		return Gdx.graphics.getWidth();
 	}
 	
-	public int sheight(){
+	private int sheight(){
 		return Gdx.graphics.getHeight();
 	}
 
@@ -207,7 +215,7 @@ public class FluxeRenderer implements Disposable{
 		buffers.dispose();
 	}
 	
-	public static Fluxor getCurrentlyRenderingFluxor(){
+	public static FluxePattern getCurrentlyRendering(){
 		return current;
 	}
 }

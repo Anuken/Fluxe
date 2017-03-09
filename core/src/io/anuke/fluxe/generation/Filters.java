@@ -216,7 +216,7 @@ public class Filters implements FluxeFilter{
 
 		@Override
 		public void modify(Color input, int x, int y){
-			Color[] colors = FluxeRenderer.getCurrentlyRenderingFluxor().palette.significantColors;
+			Color[] colors = FluxeRenderer.getCurrentlyRendering().palette.significantColors;
 			int index = Hue.closest(input, colors);
 			Color c = colors[index];
 			float shade = 1f
@@ -265,7 +265,7 @@ public class Filters implements FluxeFilter{
 
 		@Override
 		public void modify(Color input, int x, int y){
-			float d = Noise.normalNoise(x, y, scale, mag);
+			float d = Noise.snoise(x, y, scale, mag);
 			input.mul(1 + (d), 1 + (d), 1 + (d), 1f);
 		}
 	}
